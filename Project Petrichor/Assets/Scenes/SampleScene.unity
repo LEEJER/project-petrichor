@@ -2680,7 +2680,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 15
-      m_TileSpriteIndex: 12
+      m_TileSpriteIndex: 15
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -3847,14 +3847,14 @@ Tilemap:
     m_Data: {fileID: -968287315, guid: 293fd66f34a3c0d48a86e938cef4c572, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
-    m_Data: {fileID: -1253408158, guid: 293fd66f34a3c0d48a86e938cef4c572, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 2
     m_Data: {fileID: -2066608998, guid: e610760dced0c5d4cbdb01bd47223b26, type: 3}
   - m_RefCount: 2
     m_Data: {fileID: -1977515433, guid: 293fd66f34a3c0d48a86e938cef4c572, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: -1253408158, guid: 293fd66f34a3c0d48a86e938cef4c572, type: 3}
   - m_RefCount: 2
     m_Data: {fileID: 2024542165, guid: 293fd66f34a3c0d48a86e938cef4c572, type: 3}
   - m_RefCount: 3
@@ -4065,3 +4065,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
+--- !u!1 &5222871463085501009 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960237335701612984, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
+  m_PrefabInstance: {fileID: 5222871463085501008}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5222871463085501010
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5222871463085501009}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fb3677a2ebac2442a940f91d2e6365d0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
