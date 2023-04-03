@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     private List<RaycastHit2D>  castCollisions = new List<RaycastHit2D>();
     private Vector2             inputVector;
-    private Vector2             lastInputVector;
+    private Vector2             lastInputVector = Vector2.down;
     private Vector2             movementVector;
     private Rigidbody2D         playerRigidBody;
     private Animator            animator;
@@ -34,8 +34,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // If there is input
-        if (inputVector != Vector2.zero) 
+        // If there is input and sword is not swinging
+        if (inputVector != Vector2.zero && !sword.GetComponent<SwordScript>().IsSwordSwinging()) 
         { 
             movementVector = MovePlayer(inputVector); 
             lastInputVector = inputVector;
@@ -92,7 +92,7 @@ public class PlayerController : MonoBehaviour
         if (context.started) 
         {   
             SwordScript script = sword.GetComponent<SwordScript>();
-            script.SwingSword();
+            script.SwingSword(lastInputVector);
         }
         else if (context.performed) 
         {
