@@ -9,7 +9,6 @@ public class PlayerController : MonoBehaviour
     public float                collisionOffset = 0.01f;
     public ContactFilter2D      movementFilter;
 
-
     private List<RaycastHit2D>  castCollisions = new List<RaycastHit2D>();
     private Vector2             inputVector;
     private Vector2             lastInputVector = Vector2.down;
@@ -18,8 +17,13 @@ public class PlayerController : MonoBehaviour
     private Animator            animator;
     private SpriteRenderer      spriteRenderer;
 
+    private bool    isAttacking = false;
+    private bool    attackQueued = false;
+    private int     attackNum = 0;
 
-    private Transform           sword;
+    private bool    isDeflecting = false;
+    private bool    isDashing = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,14 +32,13 @@ public class PlayerController : MonoBehaviour
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        sword = transform.Find("Sword");
     }
 
 
     private void FixedUpdate()
     {
         // If there is input and sword is not swinging
-        if (inputVector != Vector2.zero && !sword.GetComponent<SwordScript>().IsSwordSwinging()) 
+        if (inputVector != Vector2.zero && !isAttacking) 
         { 
             movementVector = MovePlayer(inputVector); 
             lastInputVector = inputVector;
@@ -90,9 +93,15 @@ public class PlayerController : MonoBehaviour
     public void OnFire(InputAction.CallbackContext context) 
     {
         if (context.started) 
-        {   
-            SwordScript script = sword.GetComponent<SwordScript>();
-            script.SwingSword(lastInputVector);
+        {
+            if (!isAttacking)
+            {
+                isAttacking = true;
+            }
+            else
+            {
+                attackQueued = true;
+            }
         }
         else if (context.performed) 
         {
@@ -104,14 +113,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnDash(InputAction.CallbackContext context)
+    {
+
+    }
+
     private void Animate() {
+        // 
+        if (isAttacking)
+        {
+            animator.SetTrigger("swordAttack");
+        }
+        if (attackQueued)
+        {
+            animator.SetTrigger("swordAttackQueue");
+        }
         // Flip sprite horizontal where appropriate
         if      (inputVector.x < 0) { spriteRenderer.flipX = true;  } 
         else if (inputVector.x > 0) { spriteRenderer.flipX = false; }
 
         // Set params for Idle animations
-        animator.SetFloat("inputX", inputVector.x);
-        animator.SetFloat("inputY", inputVector.y);
         animator.SetFloat("lastMoveX", lastInputVector.x);
         animator.SetFloat("lastMoveY", lastInputVector.y);
 
@@ -119,6 +140,22 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("moveX", movementVector.x);
         animator.SetFloat("moveY", movementVector.y);
         animator.SetFloat("moveMagnitude", movementVector.magnitude);
+
+    
     }
 
+    private void EventEndDash()
+    {
+
+    }
+
+    private void EventEndAttack()
+    {
+        isAttacking = false;
+    }
+
+    private void EventEndDeflect()
+    {
+
+    }
 }
