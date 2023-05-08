@@ -5,28 +5,39 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float                movementSpeed = 1f;
-    public float                collisionOffset = 0.01f;
+    // Stuff for collision detection and movement
+    public float                movementSpeed       = 1f;
+    public float                collisionOffset     = 0.01f;
     public ContactFilter2D      movementFilter;
-
-    private List<RaycastHit2D>  castCollisions = new List<RaycastHit2D>();
+    private List<RaycastHit2D>  castCollisions      = new List<RaycastHit2D>();
     private Vector2             inputVector;
-    private Vector2             lastInputVector = Vector2.down;
+    private Vector2             lastInputVector     = Vector2.down;
     private Vector2             movementVector;
+
+
+    private bool                isMovementLocked    = false;
+    private bool                canInterruptCurrentAnimation = false;
+
+    // Game object components
     private Rigidbody2D         playerRigidBody;
     private Animator            animator;
-    private SpriteRenderer      spriteRenderer;
+    private Transform           playerSword;
+    //private SpriteRenderer      spriteRenderer;
 
+    // direction vectors for sword attacks
     private Vector2             relativeMousePos;
-    private Vector2             prevRelativeMousePos;
+    private Vector2             currentlyRunningSwordAttackVector;
+    private Vector2             queuedSwordAttackVector;
 
-    private bool                isAttacking = false;
-    private bool                isAttackQueued = false;
-    private int                 attackNum = 0;
-    private static int          numberOfAttacks = 2;
+    // parameters for sword attacks
+    private bool                isSwordAttacking        = false;
+    private bool                isSwordAttackQueued     = false;
+    private int                 swordAttackNumber       = 1;
+    private static int          maxNumberOfSwordAttacks = 2;
 
-    private bool                isDeflecting = false;
-    private bool                isDashing = false;
+    // parameters for other actions
+    private bool                isDeflecting    = false;
+    private bool                isDashing       = false;
 
 
     // Start is called before the first frame update
@@ -34,19 +45,33 @@ public class PlayerController : MonoBehaviour
     {
         inputVector             = Vector2.zero;
         relativeMousePos        = Vector2.zero;
-        prevRelativeMousePos    = Vector2.zero;
+
+        currentlyRunningSwordAttackVector = Vector2.zero;
+        queuedSwordAttackVector           = Vector2.zero;
 
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator        = GetComponent<Animator>();
-        spriteRenderer  = GetComponent<SpriteRenderer>();
-        
+        //spriteRenderer  = GetComponent<SpriteRenderer>();
+        playerSword     = transform.Find("Sword");
     }
 
 
     private void FixedUpdate()
     {
+        // if there is an item in the queue, attack is queued
+        if (queuedSwordAttackVector != Vector2.zero) { isSwordAttackQueued = true; }
+        // If we can move the queued attack to the run, do so
+        if (isSwordAttackQueued && currentlyRunningSwordAttackVector == Vector2.zero)
+        {
+            currentlyRunningSwordAttackVector = queuedSwordAttackVector;
+            queuedSwordAttackVector = Vector2.zero;
+            // cycle animation variants
+            swordAttackNumber = (swordAttackNumber + 1) % maxNumberOfSwordAttacks;
+            // the queue bool will be cleared at the start of the animation
+        }
+
         // If there is input and sword is not swinging
-        if (inputVector != Vector2.zero && !isAttacking) 
+        if (inputVector != Vector2.zero && !isMovementLocked) 
         { 
             movementVector = MovePlayer(inputVector); 
             lastInputVector = inputVector;
@@ -102,22 +127,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started) 
         {
-            prevRelativeMousePos = relativeMousePos;
-            // if we are not currently attacking
-            if (!isAttacking)
-            {
-                // attack and clear the queue
-                isAttacking = true;
-                isAttackQueued = false;
-            }
-            // if in the middle of an attack
-            else if (!isAttackQueued)
-            {
-                // queue up an attack
-                isAttackQueued = true;
-                // prepare for the next attack
-                attackNum = (attackNum + 1) % numberOfAttacks;
-            }
+            queuedSwordAttackVector = relativeMousePos;
         }
         else if (context.performed) 
         {
@@ -131,7 +141,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnMouse(InputAction.CallbackContext context)
     {
-        
         relativeMousePos = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>()) - transform.position;
     }
 
@@ -141,22 +150,20 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Animate() {
-        // sword attacks
-        if (isAttacking || isAttackQueued)
+        // Set direction for sword attack
+        if (currentlyRunningSwordAttackVector != Vector2.zero)
         {
-            animator.SetFloat("relativeMouseX", relativeMousePos.x);
-            animator.SetFloat("relativeMouseY", relativeMousePos.y);
-            animator.SetFloat("lastRelativeMouseX", prevRelativeMousePos.x);
-            animator.SetFloat("lastRelativeMouseY", prevRelativeMousePos.y);
-            lastInputVector = prevRelativeMousePos;
+            isSwordAttacking = true;
+            setLastRelativeMousePos();
         }
-        animator.SetBool("isSwordAttacking", isAttacking);
-        animator.SetInteger("swordAttackNum", attackNum);
-        animator.SetBool("isSwordAttackQueued", isAttackQueued);
-        
-        // Flip sprite horizontal where appropriate
-        //if      (inputVector.x < 0) { spriteRenderer.flipX = true;  } 
-        //else if (inputVector.x > 0) { spriteRenderer.flipX = false; }
+        if (isSwordAttackQueued)
+        {
+            setLastRelativeMousePos();
+        }
+        // Set params for sword attack
+        animator.SetBool("isSwordAttacking", isSwordAttacking);
+        animator.SetInteger("swordAttackNum", swordAttackNumber);
+        animator.SetBool("isSwordAttackQueued", isSwordAttackQueued);
 
         // Set params for Idle animations
         animator.SetFloat("lastMoveX", lastInputVector.x);
@@ -166,8 +173,18 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("moveX", movementVector.x);
         animator.SetFloat("moveY", movementVector.y);
         animator.SetFloat("moveMagnitude", movementVector.magnitude);
+        animator.SetFloat("inputMoveMagnitude", inputVector.magnitude);
 
-    
+        // Set params for interruption
+        animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
+    }
+
+    // HELPER FUNCTION FOR SWORD ANIMATION
+    private void setLastRelativeMousePos()
+    {
+        animator.SetFloat("lastRelativeMouseX", currentlyRunningSwordAttackVector.x);
+        animator.SetFloat("lastRelativeMouseY", currentlyRunningSwordAttackVector.y);
+        lastInputVector = currentlyRunningSwordAttackVector;
     }
 
     private void EventEndDash()
@@ -175,20 +192,43 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void EventEndAttack()
+    private void EventEndSwordAttack()
     {
-        isAttacking = false;
+        isSwordAttacking = false;
+        currentlyRunningSwordAttackVector = Vector2.zero;
     }
 
-    private void StartAttack()
+    private void StartSwordAttack()
     {
         // at the start of an attack, set the state and clear the queue
-        isAttackQueued = false;
-        isAttacking = true;
+        EventLockMovement();
+        EventDisableInterruptAnimation();
+        isSwordAttackQueued = false;
+        playerSword.GetComponent<SwordAttack>().AttackWithSword(currentlyRunningSwordAttackVector, swordAttackNumber, isSwordAttacking);
     }
 
     private void EventEndDeflect()
     {
 
+    }
+
+    private void EventLockMovement()
+    {
+        isMovementLocked = true;
+    }
+
+    private void EventUnlockMovement()
+    {
+        isMovementLocked = false;
+    }
+
+    private void EventAllowInterruptAnimation()
+    {
+        canInterruptCurrentAnimation = true;
+    }
+
+    private void EventDisableInterruptAnimation()
+    {
+        canInterruptCurrentAnimation = false;
     }
 }

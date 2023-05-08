@@ -685,6 +685,7 @@ GameObject:
   - component: {fileID: 1356525248}
   - component: {fileID: 1356525250}
   - component: {fileID: 1356525249}
+  - component: {fileID: 1356525251}
   m_Layer: 0
   m_Name: Sword
   m_TagString: Untagged
@@ -779,6 +780,23 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &1356525251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356525247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 552b7a271e303ef4bb98b3bb6817478c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1548038264 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960237335701612984, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
+  m_PrefabInstance: {fileID: 5222871463085501008}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1564636871
 GameObject:
   m_ObjectHideFlags: 0
@@ -4183,12 +4201,28 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5857013518596023333, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
   m_PrefabInstance: {fileID: 5222871463085501008}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1548038264}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ead7e0de168a2a341bfd67eff2244841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!70 &2043425852
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548038264}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -0.14}
+  m_Size: {x: 0.09, y: 0.04}
+  m_Direction: 1
 --- !u!1001 &5222871463085501008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4352,5 +4386,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3977995049749219257, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
