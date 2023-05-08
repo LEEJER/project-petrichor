@@ -18,8 +18,9 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer      spriteRenderer;
 
     private bool    isAttacking = false;
-    private bool    attackQueued = false;
+    private bool    isAttackQueued = false;
     private int     attackNum = 0;
+    private static int numberOfAttacks = 2;
 
     private bool    isDeflecting = false;
     private bool    isDashing = false;
@@ -94,13 +95,20 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started) 
         {
+            // if we are not currently attacking
             if (!isAttacking)
             {
+                // attack and clear the queue
                 isAttacking = true;
+                isAttackQueued = false;
             }
-            else
+            // if in the middle of an attack
+            else if (!isAttackQueued)
             {
-                attackQueued = true;
+                // queue up an attack
+                isAttackQueued = true;
+                // prepare for the next attack
+                attackNum = (attackNum + 1) % numberOfAttacks;
             }
         }
         else if (context.performed) 
@@ -119,15 +127,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Animate() {
-        // 
-        if (isAttacking)
-        {
-            animator.SetTrigger("swordAttack");
-        }
-        if (attackQueued)
-        {
-            animator.SetTrigger("swordAttackQueue");
-        }
+        // sword attacks
+        animator.SetBool("isSwordAttacking", isAttacking);
+        animator.SetInteger("swordAttackNum", attackNum);
+        animator.SetBool("isSwordAttackQueued", isAttackQueued);
         // Flip sprite horizontal where appropriate
         if      (inputVector.x < 0) { spriteRenderer.flipX = true;  } 
         else if (inputVector.x > 0) { spriteRenderer.flipX = false; }
@@ -152,6 +155,13 @@ public class PlayerController : MonoBehaviour
     private void EventEndAttack()
     {
         isAttacking = false;
+    }
+
+    private void StartAttack()
+    {
+        // at the start of an attack, set the state and clear the queue
+        isAttackQueued = false;
+        isAttacking = true;
     }
 
     private void EventEndDeflect()

@@ -11,6 +11,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: swordAttackNum
     m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: isSwordAttacking
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3711958114008192123}
   m_Solo: 0
@@ -120,7 +123,7 @@ AnimatorStateTransition:
     m_ConditionEvent: isSwordAttacking
     m_EventTreshold: 0
   - m_ConditionMode: 2
-    m_ConditionEvent: swordAttackQueued
+    m_ConditionEvent: isSwordAttackQueued
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 0}
@@ -131,7 +134,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 1
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -263,7 +266,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 2
-    m_ConditionEvent: swordAttackQueued
+    m_ConditionEvent: isSwordAttackQueued
     m_EventTreshold: 0
   - m_ConditionMode: 2
     m_ConditionEvent: isSwordAttacking
@@ -277,7 +280,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 1
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -454,7 +457,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: swordAttackQueued
+  - m_Name: isSwordAttackQueued
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -580,7 +583,13 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: swordAttackQueue
+    m_ConditionEvent: isSwordAttackQueued
+    m_EventTreshold: 0
+  - m_ConditionMode: 6
+    m_ConditionEvent: swordAttackNum
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: isSwordAttacking
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3711958114008192123}
@@ -591,7 +600,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 1
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -1200,6 +1209,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: swordAttackNum
     m_EventTreshold: 1
+  - m_ConditionMode: 1
+    m_ConditionEvent: isSwordAttacking
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1490668364300639817}
   m_Solo: 0
@@ -1242,12 +1254,12 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -1086920361028544418}
-    second:
-    - {fileID: 5832380115120532617}
   - first: {fileID: 2818072432678928148}
     second:
     - {fileID: -3115194901001845451}
+  - first: {fileID: -1086920361028544418}
+    second:
+    - {fileID: 5832380115120532617}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
@@ -1263,7 +1275,13 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: swordAttackQueue
+    m_ConditionEvent: isSwordAttackQueued
+    m_EventTreshold: 0
+  - m_ConditionMode: 6
+    m_ConditionEvent: swordAttackNum
+    m_EventTreshold: 1
+  - m_ConditionMode: 2
+    m_ConditionEvent: isSwordAttacking
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1490668364300639817}
@@ -1274,7 +1292,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 1
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -1392,7 +1410,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: swordAttack
+    m_ConditionEvent: isSwordAttacking
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 2818072432678928148}
   m_DstState: {fileID: 0}
