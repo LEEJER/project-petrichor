@@ -17,22 +17,29 @@ public class PlayerController : MonoBehaviour
     private Animator            animator;
     private SpriteRenderer      spriteRenderer;
 
-    private bool    isAttacking = false;
-    private bool    isAttackQueued = false;
-    private int     attackNum = 0;
-    private static int numberOfAttacks = 2;
+    private Vector2             relativeMousePos;
+    private Vector2             prevRelativeMousePos;
 
-    private bool    isDeflecting = false;
-    private bool    isDashing = false;
+    private bool                isAttacking = false;
+    private bool                isAttackQueued = false;
+    private int                 attackNum = 0;
+    private static int          numberOfAttacks = 2;
+
+    private bool                isDeflecting = false;
+    private bool                isDashing = false;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        inputVector = Vector2.zero;
+        inputVector             = Vector2.zero;
+        relativeMousePos        = Vector2.zero;
+        prevRelativeMousePos    = Vector2.zero;
+
         playerRigidBody = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator        = GetComponent<Animator>();
+        spriteRenderer  = GetComponent<SpriteRenderer>();
+        
     }
 
 
@@ -95,6 +102,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started) 
         {
+            prevRelativeMousePos = relativeMousePos;
             // if we are not currently attacking
             if (!isAttacking)
             {
@@ -121,6 +129,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnMouse(InputAction.CallbackContext context)
+    {
+        
+        relativeMousePos = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>()) - transform.position;
+    }
+
     public void OnDash(InputAction.CallbackContext context)
     {
 
@@ -128,12 +142,21 @@ public class PlayerController : MonoBehaviour
 
     private void Animate() {
         // sword attacks
+        if (isAttacking || isAttackQueued)
+        {
+            animator.SetFloat("relativeMouseX", relativeMousePos.x);
+            animator.SetFloat("relativeMouseY", relativeMousePos.y);
+            animator.SetFloat("lastRelativeMouseX", prevRelativeMousePos.x);
+            animator.SetFloat("lastRelativeMouseY", prevRelativeMousePos.y);
+            lastInputVector = prevRelativeMousePos;
+        }
         animator.SetBool("isSwordAttacking", isAttacking);
         animator.SetInteger("swordAttackNum", attackNum);
         animator.SetBool("isSwordAttackQueued", isAttackQueued);
+        
         // Flip sprite horizontal where appropriate
-        if      (inputVector.x < 0) { spriteRenderer.flipX = true;  } 
-        else if (inputVector.x > 0) { spriteRenderer.flipX = false; }
+        //if      (inputVector.x < 0) { spriteRenderer.flipX = true;  } 
+        //else if (inputVector.x > 0) { spriteRenderer.flipX = false; }
 
         // Set params for Idle animations
         animator.SetFloat("lastMoveX", lastInputVector.x);
