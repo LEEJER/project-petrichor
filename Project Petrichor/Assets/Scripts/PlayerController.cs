@@ -17,55 +17,25 @@ public class PlayerController : MonoBehaviour
 
     private bool                isMovementLocked    = false;
     private bool                canInterruptCurrentAnimation = true;
-    private bool                isTryInterrupt      = false;
-    private bool                isInRecovery        = false;
 
     // Game object components
     private Rigidbody2D         playerRigidBody;
     private Animator            animator;
-    private Transform           playerSword;
-
-
-    // parameters for sword attacks
-    private bool                isSwordAttacking        = false;
-    private bool                isSwordAttackQueued     = false;
-    private int                 swordAttackNumber       = 1;
-    private Vector2             swordAttackDirection    = Vector2.zero;
-
-    // parameters for other actions
-    private bool                isDeflecting    = false;
-    private bool                isDashing       = false;
-
-
-    private SwordAttackHandler  swordAttackHandler;
-
+    private Sword               sword;
 
     // Start is called before the first frame update
     void Start()
     {
-        swordAttackHandler = new SwordAttackHandler();
-
-        inputVector             = Vector2.zero;
+        inputVector     = Vector2.zero;
 
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator        = GetComponent<Animator>();
-        //spriteRenderer  = GetComponent<SpriteRenderer>();
-        playerSword     = transform.Find("Sword");
+        sword           = new Sword(transform);
     }
 
 
     private void FixedUpdate()
     {
-        // if we have an instance but are not attacking yet
-        if (swordAttackHandler.HasRunningInstance() && !isSwordAttacking && canInterruptCurrentAnimation)
-        {
-            isSwordAttacking = true;
-            SwordAttack();
-        }
-        // always maintain understanding of queue
-        isSwordAttackQueued = swordAttackHandler.HasQueuedInstance();
-        
-
         // If there is input and sword is not swinging
         if (inputVector != Vector2.zero && !isMovementLocked) 
         { 
@@ -74,30 +44,9 @@ public class PlayerController : MonoBehaviour
         } 
         else { movementVector = Vector2.zero; }
 
-        //if (canInterruptCurrentAnimation && inputVector != Vector2.zero)
-        //{
-        //    isTryInterrupt = true;
-        //}
-        // Always
         AnimateMovement();
         AnimateSwordAttack();
     }
-
-    private void SwordAttack()
-    {
-        // update values
-        SwordAttackInstance instance = swordAttackHandler.GetRunningInstance();
-        swordAttackNumber = instance.attackNum;
-        swordAttackDirection = instance.direction;
-        // run sword animation
-        playerSword.GetComponent<SwordAttack>().AttackWithSword(instance.direction, instance.attackNum);
-        // lock movement and interrupt
-        isMovementLocked = true;
-        canInterruptCurrentAnimation = false;
-        // set idle direction
-        //lastInputVector = swordAttackDirection;
-    }
-
 
     private Vector2 MovePlayer(Vector2 direction)
     {
@@ -145,7 +94,16 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started) 
         {
-            swordAttackHandler.addSwordAttack(relativeMousePos);
+            // if we can interrupt, start sword attack
+            if (canInterruptCurrentAnimation)
+            {
+                bool attackExists = sword.TryAddAttack(relativeMousePos);
+                // completely new attack
+                if (!attackExists) {
+                    canInterruptCurrentAnimation = false;
+                    isMovementLocked = true;
+                }
+            }
         }
         else if (context.performed) { }
         else if (context.canceled) { }
@@ -162,7 +120,6 @@ public class PlayerController : MonoBehaviour
     }
 
     private void AnimateMovement() {
-
         // Set params for Idle animations
         animator.SetFloat("lastMoveX", lastInputVector.x);
         animator.SetFloat("lastMoveY", lastInputVector.y);
@@ -172,44 +129,30 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("moveY", movementVector.y);
         animator.SetFloat("moveMagnitude", movementVector.magnitude);
         animator.SetFloat("inputMoveMagnitude", inputVector.magnitude);
-
-        // Set params for interruption
-        //animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
-        //animator.SetBool("isTryInterrupt", isTryInterrupt);
-        //if (isTryInterrupt)
-        //{
-        //    animator.SetTrigger("interruptTrigger");
-        //}
     }
 
     private void AnimateSwordAttack()
     {
-        if (isSwordAttacking)
-        {
-            setLastRelativeMousePos(swordAttackHandler.GetRunningInstance().direction);
-        }
-
-        animator.SetBool("isSwordAttacking", isSwordAttacking);
-        animator.SetInteger("swordAttackNum", swordAttackNumber);
-        animator.SetBool("isSwordAttackQueued", isSwordAttackQueued);
         animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
-
-        
-
-        // if we are trying another attack
-        if (canInterruptCurrentAnimation && isSwordAttackQueued)
+        // attack just started
+        if (sword.isAttacking && !canInterruptCurrentAnimation)
         {
-            // end the current attack
-            swordAttackHandler.RemoveRunningInstance();
-            isSwordAttacking = false;
-            isSwordAttackQueued = false;
+            sword.isAttacking = false;
+            animator.SetTrigger("t_swordAttack");
+            animator.SetInteger("swordAttackNum", sword.num);
+            setLastRelativeMousePos(sword.dir);
+        }
+        else if (sword.isAttacking && canInterruptCurrentAnimation)
+        {
+            //animator.SetTrigger("t_interrupt");
+            animator.SetTrigger("t_swordAttack");
+            canInterruptCurrentAnimation = false;
         }
     }
 
     //// HELPER FUNCTION FOR SWORD ANIMATION
     private void setLastRelativeMousePos(Vector2 dir)
     {
-        
         animator.SetFloat("lastRelativeMouseX", dir.x);
         animator.SetFloat("lastRelativeMouseY", dir.y);
         lastInputVector = dir;
@@ -222,10 +165,7 @@ public class PlayerController : MonoBehaviour
 
     private void EventEndSwordAttack()
     {
-        swordAttackHandler.RemoveRunningInstance();
-        isSwordAttacking = false;
-        isSwordAttackQueued = false;
-        animator.SetTrigger("recover");
+
     }
 
     private void StartSwordAttack()
@@ -258,68 +198,50 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private class SwordAttackHandler
+    private class Sword
     {
-        SwordAttackInstance[] instances;
-        private int attackNum = 0;
-        private static int maxAttackNum = 2;
+        public bool                 isAttacking = false;
+        public int                  num = 0;
+        public Vector2              dir = Vector2.zero;
+        public Transform            playerSword;
 
-        public SwordAttackHandler()
+        public Sword(Transform transform)
         {
-            instances = new SwordAttackInstance[2];
+            playerSword = transform.Find("Sword");
         }
 
-        public void addSwordAttack(Vector2 instanceVector)
+        // returns true if an attack already exists
+        public bool TryAddAttack(Vector2 dir)
         {
-            if (instances[1] != null)
+            if (this.dir != Vector2.zero)
             {
-                attackNum = (instances[1].attackNum + 1) % maxAttackNum;
+                AddAttack(dir);
+                return true;
             }
-            instances[0] = new SwordAttackInstance(instanceVector, attackNum);
+            else
+            {
+                AddAttack(dir);
+                return false;
+            }
             
-            if (instances[1] == null)
-            {
-                instances[1] = instances[0];
-                instances[0] = null;
-            }
         }
 
-        public SwordAttackInstance GetRunningInstance()
+        private void AddAttack(Vector2 dir)
         {
-            return instances[1];
+            this.dir = dir;
+            num = (num + 1) % 2;
+            isAttacking = true;
         }
 
-        public SwordAttackInstance GetQueuedInstance()
+        public void EndAttack()
         {
-            return instances[0];
+            dir = Vector2.zero;
+            isAttacking = false;
         }
 
-        public void RemoveRunningInstance()
+        public void StartAttack()
         {
-            instances[1] = instances[0];
-            instances[0] = null;
-        }
 
-        public bool HasRunningInstance()
-        {
-            return (instances[1] != null);
-        }
-
-        public bool HasQueuedInstance()
-        {
-            return (instances[0] != null);
-        }
-    }
-
-    private class SwordAttackInstance
-    {
-        public Vector2 direction;
-        public int attackNum;
-
-        public SwordAttackInstance(Vector2 dir, int num)
-        {
-            direction = dir;
-            attackNum = num;
         }
     }
 }
