@@ -33,13 +33,17 @@ public class SwordAttack : MonoBehaviour
         //animator.SetBool("attackQueued", attackQueued);
     }
 
-    public void AttackWithSword(Vector2 direction, int attackNum, bool isAttacking)
+    public void AttackWithSword(Vector2 direction, int attackNum)
     {
-        this.attackDirection = direction;
-        this.attackNum = attackNum;
-        this.isAttacking = isAttacking;
+        animator.SetFloat("dirX", direction.x);
+        animator.SetFloat("dirY", direction.y);
+        animator.SetInteger("attackNum", attackNum);
+        animator.SetTrigger("attack");
+        //this.attackDirection = direction;
+        //this.attackNum = attackNum;
+        //this.isAttacking = isAttacking;
         //this.attackQueued = attackQueued;
-        SwordAnimate();
+        //SwordAnimate();
     }
 
     private void EventEndAttackWithSword()
