@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour
                 // completely new attack
                 if (!attackExists) {
                     canInterruptCurrentAnimation = false;
-                    isMovementLocked = true;
+                    
                 }
             }
         }
@@ -135,27 +135,18 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
         // attack just started
-        if (sword.isAttacking && !canInterruptCurrentAnimation)
+        if (sword.isAttacking)
         {
+            isMovementLocked = true;
             sword.isAttacking = false;
             animator.SetTrigger("t_swordAttack");
             animator.SetInteger("swordAttackNum", sword.num);
-            setLastRelativeMousePos(sword.dir);
-        }
-        else if (sword.isAttacking && canInterruptCurrentAnimation)
-        {
-            //animator.SetTrigger("t_interrupt");
-            animator.SetTrigger("t_swordAttack");
+            animator.SetFloat("lastRelativeMouseX", sword.dir.x);
+            animator.SetFloat("lastRelativeMouseY", sword.dir.y);
+            lastInputVector = sword.dir;
+            sword.SwordAttack();
             canInterruptCurrentAnimation = false;
         }
-    }
-
-    //// HELPER FUNCTION FOR SWORD ANIMATION
-    private void setLastRelativeMousePos(Vector2 dir)
-    {
-        animator.SetFloat("lastRelativeMouseX", dir.x);
-        animator.SetFloat("lastRelativeMouseY", dir.y);
-        lastInputVector = dir;
     }
 
     private void EventEndDash()
@@ -165,7 +156,7 @@ public class PlayerController : MonoBehaviour
 
     private void EventEndSwordAttack()
     {
-
+        EventUnlockMovement();
     }
 
     private void StartSwordAttack()
@@ -233,15 +224,9 @@ public class PlayerController : MonoBehaviour
             isAttacking = true;
         }
 
-        public void EndAttack()
+        public void SwordAttack()
         {
-            dir = Vector2.zero;
-            isAttacking = false;
-        }
-
-        public void StartAttack()
-        {
-
+            playerSword.GetComponent<SwordAttack>().AttackWithSword(dir, num);
         }
     }
 }
