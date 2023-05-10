@@ -33,7 +33,8 @@ public class PlayerController : MonoBehaviour
 
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator        = GetComponent<Animator>();
-        sword           = new Sword(transform);
+        //sword           = new Sword(transform);
+        sword           = transform.Find("Sword").GetComponent<Sword>();
     }
 
 
@@ -203,48 +204,6 @@ public class PlayerController : MonoBehaviour
     private void EventDisableInterruptAnimation()
     {
 
-    }
-
-    private class Sword
-    {
-        public bool                 isAttacking = false;
-        public int                  num = 0;
-        public Vector2              dir = Vector2.zero;
-        public Transform            playerSword;
-        public float                swingMovementSpeed = 1.45f;
-
-        public Sword(Transform transform)
-        {
-            playerSword = transform.Find("Sword");
-        }
-
-        // returns true if an attack already exists
-        public bool TryAddAttack(Vector2 dir)
-        {
-            if (this.dir != Vector2.zero)
-            {
-                AddAttack(dir);
-                return true;
-            }
-            else
-            {
-                AddAttack(dir);
-                return false;
-            }
-            
-        }
-
-        private void AddAttack(Vector2 dir)
-        {
-            this.dir = dir;
-            num = (num + 1) % 2;
-            isAttacking = true;
-        }
-
-        public void SwordAttack()
-        {
-            playerSword.GetComponent<SwordAttack>().AttackWithSword(dir, num);
-        }
     }
 }
 
