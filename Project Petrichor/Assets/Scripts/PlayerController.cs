@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     // Stuff for collision detection and movement
     public float                maxSpeed            = 1f;
     public float                movementSpeed       = 1f;
-    public float                collisionOffset     = 0.01f;
+    public float                collisionOffset     = 0.05f;
     public ContactFilter2D      movementFilter;
     private List<RaycastHit2D>  castCollisions      = new List<RaycastHit2D>();
     private Vector2             inputVector;
@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private Vector2             movementVector;
     private Vector2             relativeMousePos    = Vector2.zero;
     private Vector2             velocityVector      = Vector2.zero;
+    private float               velocityDecayRate   = 4f;
 
     private bool                isMovementLocked    = false;
     private bool                canInterruptCurrentAnimation = true;
@@ -38,16 +39,32 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // handle old velocity first
+        velocityVector += (Vector2.zero - velocityVector.normalized) * Mathf.Min(velocityDecayRate * Time.fixedDeltaTime, velocityVector.magnitude);
+        if (velocityVector.magnitude < 0.01f) { velocityVector = Vector2.zero; }
+        movementVector = MovePlayer(velocityVector, velocityVector.magnitude);
+
         // If there is input and sword is not swinging
         if (inputVector != Vector2.zero && !isMovementLocked) 
-        { 
-            movementVector = MovePlayer(inputVector, movementSpeed); 
+        {
+            //movementVector = MovePlayer(inputVector, movementSpeed); 
+            velocityVector = inputVector * movementSpeed;
             lastInputVector = inputVector;
-        } 
-        else { movementVector = Vector2.zero; }
+        }
 
-        AnimateMovement();
+        if (sword.isAttacking)
+        {
+            isMovementLocked = true;
+
+            velocityVector = Vector2.zero;
+            lastInputVector = sword.dir;
+            
+
+            velocityVector = sword.dir.normalized * 1.45f;
+        }
+
         AnimateSwordAttack();
+        AnimateMovement();
     }
 
     private Vector2 MovePlayer(Vector2 direction, float speed)
@@ -138,16 +155,13 @@ public class PlayerController : MonoBehaviour
         // attack just started
         if (sword.isAttacking)
         {
-            isMovementLocked = true;
             sword.isAttacking = false;
             animator.SetTrigger("t_swordAttack");
             animator.SetInteger("swordAttackNum", sword.num);
             animator.SetFloat("lastRelativeMouseX", sword.dir.x);
             animator.SetFloat("lastRelativeMouseY", sword.dir.y);
-            lastInputVector = sword.dir;
-            sword.SwordAttack();
             canInterruptCurrentAnimation = false;
-            MovePlayer(sword.dir, 20f);
+            sword.SwordAttack();
         }
     }
 
