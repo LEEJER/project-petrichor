@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     // Stuff for collision detection and movement
     public float                maxSpeed            = 1f;
     public float                movementSpeed       = 1f;
-    public float                collisionOffset     = 0.05f;
+    public float                collisionOffset     = 0.08f;
     public ContactFilter2D      movementFilter;
     private List<RaycastHit2D>  castCollisions      = new List<RaycastHit2D>();
     private Vector2             inputVector;
@@ -42,10 +42,10 @@ public class PlayerController : MonoBehaviour
         // handle old velocity first
         velocityVector += (Vector2.zero - velocityVector.normalized) * Mathf.Min(velocityDecayRate * Time.fixedDeltaTime, velocityVector.magnitude);
         if (velocityVector.magnitude < 0.01f) { velocityVector = Vector2.zero; }
-        movementVector = MovePlayer(velocityVector, velocityVector.magnitude);
+        MovePlayer(velocityVector.normalized, velocityVector.magnitude);
 
         // If there is input and sword is not swinging
-        if (inputVector != Vector2.zero && !isMovementLocked) 
+        if (inputVector != Vector2.zero && !isMovementLocked && canInterruptCurrentAnimation) 
         {
             //movementVector = MovePlayer(inputVector, movementSpeed); 
             velocityVector = inputVector * movementSpeed;
@@ -55,16 +55,12 @@ public class PlayerController : MonoBehaviour
         if (sword.isAttacking)
         {
             isMovementLocked = true;
-
-            velocityVector = Vector2.zero;
+            //velocityVector = Vector2.zero;
             lastInputVector = sword.dir;
-            
-
-            velocityVector = sword.dir.normalized * 1.45f;
         }
 
-        AnimateSwordAttack();
         AnimateMovement();
+        AnimateSwordAttack();
     }
 
     private Vector2 MovePlayer(Vector2 direction, float speed)
@@ -81,12 +77,15 @@ public class PlayerController : MonoBehaviour
         else 
         {
             // There was a collision, try each direction
-            int countX = RigidbodyRaycast(new Vector2(direction.x, 0), speed);
-            int countY = RigidbodyRaycast(new Vector2(0, direction.y), speed);
-            if (countX == 0) {
-                newDir = new Vector2(direction.x, 0) * speed * Time.fixedDeltaTime;
-            } else if (countY == 0) {
-                newDir = new Vector2(0, direction.y) * speed * Time.fixedDeltaTime;
+            int countX = RigidbodyRaycast(new Vector2(direction.x, 0), (Mathf.Abs(direction.x) * speed));
+            int countY = RigidbodyRaycast(new Vector2(0, direction.y), (Mathf.Abs(direction.y) * speed));
+            if (countX == 0) 
+            {
+                newDir = new Vector2(direction.x, 0) * (Mathf.Abs(direction.x) * speed) * Time.fixedDeltaTime;
+            } 
+            else if (countY == 0) 
+            {
+                newDir = new Vector2(0, direction.y) * (Mathf.Abs(direction.y) * speed) * Time.fixedDeltaTime;
             }
         }
         playerRigidBody.MovePosition(playerRigidBody.position + newDir);
@@ -139,14 +138,13 @@ public class PlayerController : MonoBehaviour
 
     private void AnimateMovement() {
         // Set params for Idle animations
-        animator.SetFloat("lastMoveX", lastInputVector.x);
-        animator.SetFloat("lastMoveY", lastInputVector.y);
+        animator.SetFloat("facing_x", lastInputVector.x);
+        animator.SetFloat("facing_y", lastInputVector.y);
 
         // Set params for Running
-        animator.SetFloat("moveX", movementVector.x);
-        animator.SetFloat("moveY", movementVector.y);
-        animator.SetFloat("moveMagnitude", movementVector.magnitude);
-        animator.SetFloat("inputMoveMagnitude", inputVector.magnitude);
+        animator.SetFloat("velocity_x", velocityVector.x);
+        animator.SetFloat("velocity_y", velocityVector.y);
+        animator.SetFloat("velocity_magnitude", velocityVector.magnitude);
     }
 
     private void AnimateSwordAttack()
@@ -157,11 +155,13 @@ public class PlayerController : MonoBehaviour
         {
             sword.isAttacking = false;
             animator.SetTrigger("t_swordAttack");
-            animator.SetInteger("swordAttackNum", sword.num);
-            animator.SetFloat("lastRelativeMouseX", sword.dir.x);
-            animator.SetFloat("lastRelativeMouseY", sword.dir.y);
+            animator.SetInteger("swordAttack_num", sword.num);
+            animator.SetFloat("swordAttack_dir_x", sword.dir.x);
+            animator.SetFloat("swordAttack_dir_y", sword.dir.y);
             canInterruptCurrentAnimation = false;
+
             sword.SwordAttack();
+            velocityVector = (velocityVector * 0.5f) + sword.dir.normalized * sword.swingMovementSpeed;
         }
     }
 
@@ -211,6 +211,7 @@ public class PlayerController : MonoBehaviour
         public int                  num = 0;
         public Vector2              dir = Vector2.zero;
         public Transform            playerSword;
+        public float                swingMovementSpeed = 1.45f;
 
         public Sword(Transform transform)
         {

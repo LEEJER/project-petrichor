@@ -403,6 +403,11 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &506664395 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960237335701612984, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
+  m_PrefabInstance: {fileID: 5222871463085501008}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4073,6 +4078,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3148820950895580400, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
   m_PrefabInstance: {fileID: 5222871463085501008}
   m_PrefabAsset: {fileID: 0}
+--- !u!58 &2043425851
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506664395}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -0.11}
+  serializedVersion: 2
+  m_Radius: 0.05
 --- !u!1001 &5222871463085501008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4080,6 +4101,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2043425852, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3148820950895580400, guid: 15935a1667afd8b418a22443c5a1f6e0, type: 3}
       propertyPath: m_RootOrder
       value: 1
