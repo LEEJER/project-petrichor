@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     // Stuff for collision detection and movement
+    public float                maxSpeed            = 1f;
     public float                movementSpeed       = 1f;
     public float                collisionOffset     = 0.01f;
     public ContactFilter2D      movementFilter;
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private Vector2             lastInputVector     = Vector2.down;
     private Vector2             movementVector;
     private Vector2             relativeMousePos    = Vector2.zero;
+    private Vector2             velocityVector      = Vector2.zero;
 
     private bool                isMovementLocked    = false;
     private bool                canInterruptCurrentAnimation = true;
@@ -39,7 +41,7 @@ public class PlayerController : MonoBehaviour
         // If there is input and sword is not swinging
         if (inputVector != Vector2.zero && !isMovementLocked) 
         { 
-            movementVector = MovePlayer(inputVector); 
+            movementVector = MovePlayer(inputVector, movementSpeed); 
             lastInputVector = inputVector;
         } 
         else { movementVector = Vector2.zero; }
@@ -48,26 +50,26 @@ public class PlayerController : MonoBehaviour
         AnimateSwordAttack();
     }
 
-    private Vector2 MovePlayer(Vector2 direction)
+    private Vector2 MovePlayer(Vector2 direction, float speed)
     {
         Vector2 newDir = new Vector2(0, 0);
         // Check for potential collisions
-        int count = RigidbodyRaycast(direction);
+        int count = RigidbodyRaycast(direction, speed);
         
         if (count == 0)
         {
             // If there were no collisions, continue as normal
-            newDir = direction * movementSpeed * Time.fixedDeltaTime;
+            newDir = direction * speed * Time.fixedDeltaTime;
         } 
         else 
         {
             // There was a collision, try each direction
-            int countX = RigidbodyRaycast(new Vector2(direction.x, 0));
-            int countY = RigidbodyRaycast(new Vector2(0, direction.y));
+            int countX = RigidbodyRaycast(new Vector2(direction.x, 0), speed);
+            int countY = RigidbodyRaycast(new Vector2(0, direction.y), speed);
             if (countX == 0) {
-                newDir = new Vector2(direction.x, 0) * movementSpeed * Time.fixedDeltaTime;
+                newDir = new Vector2(direction.x, 0) * speed * Time.fixedDeltaTime;
             } else if (countY == 0) {
-                newDir = new Vector2(0, direction.y) * movementSpeed * Time.fixedDeltaTime;
+                newDir = new Vector2(0, direction.y) * speed * Time.fixedDeltaTime;
             }
         }
         playerRigidBody.MovePosition(playerRigidBody.position + newDir);
@@ -75,13 +77,13 @@ public class PlayerController : MonoBehaviour
     }
     
     // THIS IS A HELPER FUNCTION TO: MovePlayer()
-    private int RigidbodyRaycast(Vector2 direction) 
+    private int RigidbodyRaycast(Vector2 direction, float speed) 
     {
         return playerRigidBody.Cast(
             direction, // X, Y; from -1 to 1. direction from body to look for collisions
             movementFilter, // Settings to determine where collisions can occur (layer)
             castCollisions, // List of collisions to store found collisions after cast is called
-            movementSpeed * Time.fixedDeltaTime + collisionOffset // Distance of raycast. Equals movement plus an offset value.
+            speed * Time.fixedDeltaTime + collisionOffset // Distance of raycast. Equals movement plus an offset value.
         );
     }
 
@@ -101,7 +103,6 @@ public class PlayerController : MonoBehaviour
                 // completely new attack
                 if (!attackExists) {
                     canInterruptCurrentAnimation = false;
-                    
                 }
             }
         }
@@ -146,6 +147,7 @@ public class PlayerController : MonoBehaviour
             lastInputVector = sword.dir;
             sword.SwordAttack();
             canInterruptCurrentAnimation = false;
+            MovePlayer(sword.dir, 20f);
         }
     }
 
