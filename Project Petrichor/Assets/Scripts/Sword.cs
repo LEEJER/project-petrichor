@@ -24,10 +24,13 @@ public class Sword : MonoBehaviour
         return val;
     }
 
-    private void AddAttack(Vector2 dir)
+    public void AddAttack(Vector2 dir)
     {
         this.dir = dir;
-        num = (num + 1) % 2;
+        if (!isAttacking)
+        {
+            num = (num + 1) % 2;
+        }
         isAttacking = true;
     }
 

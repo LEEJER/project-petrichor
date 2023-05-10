@@ -53,15 +53,13 @@ public class PlayerController : MonoBehaviour
             lastInputVector = inputVector;
         }
 
-        if (sword.isAttacking)
+        AnimateMovement();
+
+        if (sword.isAttacking && canInterruptCurrentAnimation)
         {
-            isMovementLocked = true;
-            //velocityVector = Vector2.zero;
-            lastInputVector = sword.dir;
+            AnimateSwordAttack();
         }
 
-        AnimateMovement();
-        AnimateSwordAttack();
     }
 
     private Vector2 MovePlayer(Vector2 direction, float speed)
@@ -113,15 +111,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started) 
         {
-            // if we can interrupt, start sword attack
-            if (canInterruptCurrentAnimation)
-            {
-                bool attackExists = sword.TryAddAttack(relativeMousePos);
-                // completely new attack
-                if (!attackExists) {
-                    canInterruptCurrentAnimation = false;
-                }
-            }
+            sword.AddAttack(relativeMousePos);
         }
         else if (context.performed) { }
         else if (context.canceled) { }
@@ -146,24 +136,26 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("velocity_x", velocityVector.x);
         animator.SetFloat("velocity_y", velocityVector.y);
         animator.SetFloat("velocity_magnitude", velocityVector.magnitude);
+
+        animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
     }
 
     private void AnimateSwordAttack()
     {
         animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
-        // attack just started
-        if (sword.isAttacking)
-        {
-            sword.isAttacking = false;
-            animator.SetTrigger("t_swordAttack");
-            animator.SetInteger("swordAttack_num", sword.num);
-            animator.SetFloat("swordAttack_dir_x", sword.dir.x);
-            animator.SetFloat("swordAttack_dir_y", sword.dir.y);
-            canInterruptCurrentAnimation = false;
 
-            sword.SwordAttack();
-            velocityVector = (velocityVector * 0.5f) + sword.dir.normalized * sword.swingMovementSpeed;
-        }
+        sword.isAttacking               = false;
+        isMovementLocked                = true;
+        canInterruptCurrentAnimation    = false;
+        lastInputVector                 = sword.dir;
+
+        animator.SetTrigger("t_swordAttack");
+        animator.SetInteger("swordAttack_num", sword.num);
+        animator.SetFloat("swordAttack_dir_x", sword.dir.x);
+        animator.SetFloat("swordAttack_dir_y", sword.dir.y);
+
+        sword.SwordAttack();
+        velocityVector = (velocityVector * 0.5f) + sword.dir.normalized * sword.swingMovementSpeed;
     }
 
     private void EventEndDash()
