@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerIdleState : PlayerState
 {
-   
     public override void EnterState(PlayerStateMachine player)
     {
         
@@ -24,16 +23,21 @@ public class PlayerIdleState : PlayerState
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        //if (context.started || context.performed)
-        //{
-        //    player.FacingVector = context.ReadValue<Vector2>();
-        //    player.SwitchState(player.RunState);
-        //}
-        //else if (context.canceled) { }
+        if (context.started || context.performed)
+        {
+            player.FacingVector = context.ReadValue<Vector2>();
+            player.SwitchState(player.RunState);
+        }
+        else if (context.canceled) { }
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            player.SwitchState(player.AttackState);
+        }
+        else if (context.performed) { }
+        else if (context.canceled) { }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
@@ -46,7 +50,7 @@ public class PlayerIdleState : PlayerState
 
     private void Animate(PlayerStateMachine player)
     {
-        //player.animator.SetFloat("facing_x", player.FacingVector.x);
-        //player.animator.SetFloat("facing_y", player.FacingVector.y);
+        player.animator.SetFloat("facing_x", player.FacingVector.x);
+        player.animator.SetFloat("facing_y", player.FacingVector.y);
     }
 }

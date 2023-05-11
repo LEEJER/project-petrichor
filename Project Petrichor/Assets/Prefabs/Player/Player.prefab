@@ -12,11 +12,8 @@ GameObject:
   - component: {fileID: 6694584548069043551}
   - component: {fileID: 809696824559796262}
   - component: {fileID: 1323966228459506178}
-  - component: {fileID: 7190425703883226793}
-  - component: {fileID: 572197580147094244}
-  - component: {fileID: 7190425703883226785}
+  - component: {fileID: 3574010773074144277}
   - component: {fileID: 5297803684062367706}
-  - component: {fileID: 6248903267772719869}
   - component: {fileID: 2216841415124748458}
   m_Layer: 0
   m_Name: Player
@@ -120,8 +117,8 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7190425703883226793}
-        m_TargetAssemblyTypeName: Test, Assembly-CSharp
+      - m_Target: {fileID: 3574010773074144277}
+        m_TargetAssemblyTypeName: PlayerStateMachine, Assembly-CSharp
         m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
@@ -140,7 +137,7 @@ MonoBehaviour:
     m_ActionName: Player/Look[/Mouse/delta,/Pen/delta]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7190425703883226785}
+      - m_Target: {fileID: 3574010773074144277}
         m_TargetAssemblyTypeName: PlayerStateMachine, Assembly-CSharp
         m_MethodName: OnFire
         m_Mode: 0
@@ -196,7 +193,7 @@ MonoBehaviour:
     m_ActionName: UI/TrackedDeviceOrientation
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7190425703883226785}
+      - m_Target: {fileID: 3574010773074144277}
         m_TargetAssemblyTypeName: PlayerStateMachine, Assembly-CSharp
         m_MethodName: OnDash
         m_Mode: 0
@@ -212,7 +209,7 @@ MonoBehaviour:
     m_ActionName: Player/Dash[/Keyboard/space]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7190425703883226785}
+      - m_Target: {fileID: 3574010773074144277}
         m_TargetAssemblyTypeName: PlayerStateMachine, Assembly-CSharp
         m_MethodName: OnMouse
         m_Mode: 0
@@ -252,82 +249,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &7190425703883226793
+--- !u!114 &3574010773074144277
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3089953179542830969}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23ecfd4db872be24387ef5c3da46bc46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionOffset: 0.05
-  movementFilter:
-    useTriggers: 0
-    useLayerMask: 0
-    useDepth: 0
-    useOutsideDepth: 0
-    useNormalAngle: 0
-    useOutsideNormalAngle: 0
-    layerMask:
-      serializedVersion: 2
-      m_Bits: 0
-    minDepth: 0
-    maxDepth: 0
-    minNormalAngle: 0
-    maxNormalAngle: 0
-  maxVelocity: 10
-  movementSpeed: 1
-  velocityDecayRate: 4
-  dashSpeed: 3
---- !u!114 &572197580147094244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3089953179542830969}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ead7e0de168a2a341bfd67eff2244841, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionOffset: 0
-  movementFilter:
-    useTriggers: 0
-    useLayerMask: 0
-    useDepth: 0
-    useOutsideDepth: 0
-    useNormalAngle: 0
-    useOutsideNormalAngle: 0
-    layerMask:
-      serializedVersion: 2
-      m_Bits: 0
-    minDepth: 0
-    maxDepth: 0
-    minNormalAngle: 0
-    maxNormalAngle: 0
-  maxVelocity: 10
-  movementSpeed: 1
-  velocityDecayRate: 4
-  dashSpeed: 3
---- !u!114 &7190425703883226785
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3089953179542830969}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97a039e02b4afdb4b8b5a39c2bb02721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionOffset: 0.05
-  movementFilter:
+  _collisionOffset: 0.0005
+  _movementFilter:
     useTriggers: 0
     useLayerMask: 0
     useDepth: 0
@@ -341,10 +276,11 @@ MonoBehaviour:
     maxDepth: 0
     minNormalAngle: 0
     maxNormalAngle: 0
-  maxVelocity: 10
-  movementSpeed: 1
-  velocityDecayRate: 4
-  dashSpeed: 3
+  MaxVelocity: 10
+  MovementSpeed: 1
+  VelocityDecayRate: 4.5
+  DashSpeed: 3
+  animator: {fileID: 0}
 --- !u!95 &5297803684062367706
 Animator:
   serializedVersion: 5
@@ -365,22 +301,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!70 &6248903267772719869
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3089953179542830969}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.14}
-  m_Size: {x: 0.09, y: 0.04}
-  m_Direction: 1
 --- !u!58 &2216841415124748458
 CircleCollider2D:
   m_ObjectHideFlags: 0
