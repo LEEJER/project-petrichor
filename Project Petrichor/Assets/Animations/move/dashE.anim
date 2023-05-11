@@ -94,21 +94,14 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.2
-    functionName: EventAllowInterruptAnimation
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.4
-    functionName: EventEndDash
+    functionName: Event_DashState_AllowInterrupt
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.9
-    functionName: EventUnlockMovement
+    functionName: Event_DashState_EndDash
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

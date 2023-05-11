@@ -12,7 +12,10 @@ public class PlayerIdleState : PlayerState
 
     public override void UpdateState(PlayerStateMachine player)
     {
-
+        if (player.InputVector != Vector2.zero)
+        {
+            player.SwitchState(player.RunState);
+        }
         Animate(player);
     }
 
@@ -26,7 +29,6 @@ public class PlayerIdleState : PlayerState
         if (context.started || context.performed)
         {
             player.FacingVector = context.ReadValue<Vector2>();
-            player.SwitchState(player.RunState);
         }
         else if (context.canceled) { }
     }
@@ -41,7 +43,10 @@ public class PlayerIdleState : PlayerState
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            player.SwitchState(player.DashState);
+        }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {

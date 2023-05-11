@@ -5,12 +5,13 @@ using UnityEngine.InputSystem;
 
 public class PlayerAttackState : PlayerState
 {
-    private bool canBufferInput = false;
-    private bool canInterrupt = false;
-    private bool startAttack = false;
-    private bool endAttack = false;
-    private int attackNum = 0;
-    private Vector2 dir = Vector2.zero;
+    private bool    canBufferInput  = false;
+    private bool    canInterrupt    = false;
+    private bool    startAttack     = false;
+    private bool    endAttack       = false;
+    private bool    startDash       = false;
+    private int     attackNum       = 0;
+    private Vector2 dir             = Vector2.zero;
 
     public override void EnterState(PlayerStateMachine player)
     {
@@ -19,11 +20,11 @@ public class PlayerAttackState : PlayerState
         startAttack     = true;
         endAttack       = false;
         canInterrupt    = true;
+        startDash       = false;
     }
 
     public override void UpdateState(PlayerStateMachine player)
     {
-        if (canInterrupt) { player.animator.SetTrigger("t_swordAttackNext"); }
         // run the attack
         if (startAttack && canInterrupt)
         {
@@ -34,26 +35,52 @@ public class PlayerAttackState : PlayerState
             startAttack     = false;
             canBufferInput  = false;
             endAttack       = false;
+            startDash       = false;
 
             player.sword.SwordAttack(dir, attackNum);
             player.VelocityVector = (player.VelocityVector * 0.5f) + dir.normalized * player.sword.swingMovementSpeed;
             attackNum = (attackNum + 1) % 2;
         }
-        else if (endAttack)
+
+        else if (startDash && canInterrupt)
         {
-            // end attack, return to idle
+            player.animator.SetTrigger("t_dash");
+            Interrupt(player, player.DashState);
+        }
+
+        //if (endAttack)
+        //{
+        //    // end attack, return to idle
+        //    player.SwitchState(player.IdleState);
+        //}
+
+        else if (canInterrupt && player.InputVector != Vector2.zero)
+        {
+            //canInterrupt = false;
+            //startDash = false;
+            player.FacingVector = player.InputVector;
+            player.animator.SetTrigger("t_interrupt");
             player.SwitchState(player.IdleState);
         }
     }
 
     public override void ExitState(PlayerStateMachine player)
     {
-
+        startAttack     = false;
+        canInterrupt    = true;
+        endAttack       = true;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-
+        if (context.started || context.performed)
+        {
+            if (canInterrupt)
+            {
+                //endAttack = true;
+                Interrupt(player, player.IdleState);
+            }
+        }
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
@@ -66,7 +93,10 @@ public class PlayerAttackState : PlayerState
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            startDash = true; 
+        }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
@@ -82,16 +112,26 @@ public class PlayerAttackState : PlayerState
         player.animator.SetFloat("swordAttack_dir_y", dir.y);
     }
 
+    private void Interrupt(PlayerStateMachine player, PlayerState state)
+    {
+        player.animator.SetTrigger("t_interrupt");
+        //canInterrupt    = false;
+        //startAttack     = false;
+        //endAttack       = true;
+        player.SwitchState(state);
+    }
+
     public void EventAllowInterrupt()
     {
         canInterrupt = true;
     }
 
-    public void EventEndSwordAttack()
+    public void EventEndSwordAttack(PlayerStateMachine player)
     {
-        startAttack = false;
-        canInterrupt = true;
-        endAttack = true;
+        //startAttack = false;
+        //canInterrupt = true;
+        //endAttack = true;
+        player.SwitchState(player.IdleState);
     }
 
     public void EventAllowBuffer()

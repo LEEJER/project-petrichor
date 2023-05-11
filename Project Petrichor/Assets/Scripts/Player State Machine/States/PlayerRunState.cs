@@ -48,7 +48,10 @@ public class PlayerRunState : PlayerState
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            player.SwitchState(player.DashState);
+        }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {

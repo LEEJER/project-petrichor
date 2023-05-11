@@ -22,7 +22,7 @@ public class PlayerStateMachine : MonoBehaviour
     // Movement params
     public float MaxVelocity        = 10f;
     public float MovementSpeed      = 1f;
-    public float VelocityDecayRate  = 4.5f;
+    public float VelocityDecayRate  = 5f;
     public float DashSpeed          = 3f;
 
     Vector2 _velocityVector     = Vector2.zero;
@@ -114,6 +114,7 @@ public class PlayerStateMachine : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         _inputVector = context.ReadValue<Vector2>();
+        //Debug.Log(_inputVector);
         currentState.OnMove(this, context);
     }
 
@@ -155,11 +156,21 @@ public class PlayerStateMachine : MonoBehaviour
 
     public void Event_AttackState_EndSwordAttack()
     {
-        AttackState.EventEndSwordAttack();
+        AttackState.EventEndSwordAttack(this);
     }
 
     public void Event_AttackState_AllowBuffer()
     {
         AttackState.EventAllowBuffer();
+    }
+
+    public void Event_DashState_AllowInterrupt()
+    {
+        DashState.EventAllowInterrupt();
+    }
+
+    public void Event_DashState_EndDash()
+    {
+        DashState.EventEndDash(this);
     }
 }
