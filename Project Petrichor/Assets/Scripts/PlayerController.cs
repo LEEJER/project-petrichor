@@ -6,25 +6,34 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     // Stuff for collision detection and movement
-    public float                maxSpeed            = 1f;
-    public float                movementSpeed       = 1f;
-    public float                collisionOffset     = 0.08f;
-    public ContactFilter2D      movementFilter;
-    private List<RaycastHit2D>  castCollisions      = new List<RaycastHit2D>();
+    [SerializeField] private float              collisionOffset = 0.08f;
+    [SerializeField] private ContactFilter2D    movementFilter;
+    private List<RaycastHit2D>                  castCollisions  = new List<RaycastHit2D>();
+
+    // Movement params
+    [SerializeField] private float  maxVelocity         = 10f;
+    [SerializeField] private float  movementSpeed       = 1f;
+    [SerializeField] private float  velocityDecayRate   = 4f;
+    [SerializeField] private float  dashSpeed           = 3f;
+
+    private Vector2             velocityVector      = Vector2.zero;
+
+    // input vectors
     private Vector2             inputVector;
     private Vector2             lastInputVector     = Vector2.down;
-    private Vector2             movementVector;
     private Vector2             relativeMousePos    = Vector2.zero;
-    private Vector2             velocityVector      = Vector2.zero;
-    private float               velocityDecayRate   = 4f;
 
+    // general animation
     private bool                isMovementLocked    = false;
     private bool                canInterruptCurrentAnimation = true;
+
+    // avility animation
+    private bool                isDashing           = false;
+    private Sword               sword;
 
     // Game object components
     private Rigidbody2D         playerRigidBody;
     private Animator            animator;
-    private Sword               sword;
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +42,6 @@ public class PlayerController : MonoBehaviour
 
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator        = GetComponent<Animator>();
-        //sword           = new Sword(transform);
         sword           = transform.Find("Sword").GetComponent<Sword>();
     }
 
@@ -43,7 +51,11 @@ public class PlayerController : MonoBehaviour
         // handle old velocity first
         velocityVector += (Vector2.zero - velocityVector.normalized) * Mathf.Min(velocityDecayRate * Time.fixedDeltaTime, velocityVector.magnitude);
         if (velocityVector.magnitude < 0.01f) { velocityVector = Vector2.zero; }
+        Debug.Log(velocityVector.magnitude);
+
         MovePlayer(velocityVector.normalized, velocityVector.magnitude);
+
+        
 
         // If there is input and sword is not swinging
         if (inputVector != Vector2.zero && !isMovementLocked && canInterruptCurrentAnimation) 
@@ -54,6 +66,12 @@ public class PlayerController : MonoBehaviour
         }
 
         AnimateMovement();
+
+        // Dashing
+        if (isDashing && canInterruptCurrentAnimation)
+        {
+            AnimateDash();
+        }
 
         if (sword.isAttacking && canInterruptCurrentAnimation)
         {
@@ -124,7 +142,10 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            isDashing = true;
+        }
     }
 
     private void AnimateMovement() {
@@ -156,6 +177,17 @@ public class PlayerController : MonoBehaviour
 
         sword.SwordAttack();
         velocityVector = (velocityVector * 0.5f) + sword.dir.normalized * sword.swingMovementSpeed;
+    }
+
+    private void AnimateDash()
+    {
+        canInterruptCurrentAnimation    = false;
+        isDashing                       = false;
+        isMovementLocked                = true;
+
+        animator.SetTrigger("t_dash");
+
+        velocityVector                  = lastInputVector.normalized * dashSpeed;
     }
 
     private void EventEndDash()
