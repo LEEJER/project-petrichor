@@ -8,7 +8,6 @@ public class PlayerAttackState : PlayerState
     private bool    canBufferInput  = false;
     private bool    canInterrupt    = false;
     private bool    startAttack     = false;
-    private bool    endAttack       = false;
     private bool    startDash       = false;
     private int     attackNum       = 0;
     private Vector2 dir             = Vector2.zero;
@@ -18,7 +17,6 @@ public class PlayerAttackState : PlayerState
         // entering the attack state for the first time
         attackNum       = 0;
         startAttack     = true;
-        endAttack       = false;
         canInterrupt    = true;
         startDash       = false;
     }
@@ -34,7 +32,6 @@ public class PlayerAttackState : PlayerState
             canInterrupt    = false;
             startAttack     = false;
             canBufferInput  = false;
-            endAttack       = false;
             startDash       = false;
 
             player.sword.SwordAttack(dir, attackNum);
@@ -47,17 +44,8 @@ public class PlayerAttackState : PlayerState
             player.animator.SetTrigger("t_dash");
             Interrupt(player, player.DashState);
         }
-
-        //if (endAttack)
-        //{
-        //    // end attack, return to idle
-        //    player.SwitchState(player.IdleState);
-        //}
-
         else if (canInterrupt && player.InputVector != Vector2.zero)
         {
-            //canInterrupt = false;
-            //startDash = false;
             player.FacingVector = player.InputVector;
             player.animator.SetTrigger("t_interrupt");
             player.SwitchState(player.IdleState);
@@ -68,7 +56,6 @@ public class PlayerAttackState : PlayerState
     {
         startAttack     = false;
         canInterrupt    = true;
-        endAttack       = true;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -77,7 +64,6 @@ public class PlayerAttackState : PlayerState
         {
             if (canInterrupt)
             {
-                //endAttack = true;
                 Interrupt(player, player.IdleState);
             }
         }
@@ -115,9 +101,6 @@ public class PlayerAttackState : PlayerState
     private void Interrupt(PlayerStateMachine player, PlayerState state)
     {
         player.animator.SetTrigger("t_interrupt");
-        //canInterrupt    = false;
-        //startAttack     = false;
-        //endAttack       = true;
         player.SwitchState(state);
     }
 
@@ -128,9 +111,6 @@ public class PlayerAttackState : PlayerState
 
     public void EventEndSwordAttack(PlayerStateMachine player)
     {
-        //startAttack = false;
-        //canInterrupt = true;
-        //endAttack = true;
         player.SwitchState(player.IdleState);
     }
 

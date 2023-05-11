@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
 
     // Movement params
-    [SerializeField] private float MaxVelocity = 10f;
+    //[SerializeField] private float MaxVelocity = 10f;
     [SerializeField] private float MovementSpeed = 1f;
     [SerializeField] private float VelocityDecayRate = 4f;
     [SerializeField] private float DashSpeed = 3f;
