@@ -452,6 +452,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
+  - m_Name: t_swordAttackNext
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
   - m_Name: t_dash
     m_Type: 9
     m_DefaultFloat: 0
@@ -859,7 +865,7 @@ AnimatorStateTransition:
     m_ConditionEvent: t_swordAttack
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: canInterrupt
+    m_ConditionEvent: t_swordAttackNext
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1490668364300639817}
@@ -1044,7 +1050,7 @@ AnimatorStateTransition:
     m_ConditionEvent: t_swordAttack
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: canInterrupt
+    m_ConditionEvent: t_swordAttackNext
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3711958114008192123}
@@ -1285,12 +1291,12 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -1086920361028544418}
-    second:
-    - {fileID: 5832380115120532617}
   - first: {fileID: 2818072432678928148}
     second:
     - {fileID: -4244129535970923983}
+  - first: {fileID: -1086920361028544418}
+    second:
+    - {fileID: 5832380115120532617}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
