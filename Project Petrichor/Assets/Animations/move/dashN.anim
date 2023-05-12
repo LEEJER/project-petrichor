@@ -20,25 +20,25 @@ AnimationClip:
   m_PPtrCurves:
   - curve:
     - time: 0
-      value: {fileID: -1790677674, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: 1875113685, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.1
-      value: {fileID: 131899173, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: -387927607, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.2
-      value: {fileID: -1404842224, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: 1494059000, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.3
-      value: {fileID: 1535161465, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: 805875283, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.4
-      value: {fileID: 1009031215, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: -709454753, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.5
-      value: {fileID: 1254402976, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: -1843257731, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.6
-      value: {fileID: 1044683348, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: -1015942581, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.7
-      value: {fileID: 1981669939, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: -703255775, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.8
-      value: {fileID: 1210242625, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: 1561787530, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     - time: 0.9
-      value: {fileID: 850575704, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+      value: {fileID: 1906558457, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -58,16 +58,16 @@ AnimationClip:
       customType: 23
       isPPtrCurve: 1
     pptrCurveMapping:
-    - {fileID: -1790677674, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 131899173, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: -1404842224, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1535161465, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1009031215, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1254402976, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1044683348, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1981669939, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 1210242625, guid: 6afe12eb268da514581b3ece60034799, type: 3}
-    - {fileID: 850575704, guid: 6afe12eb268da514581b3ece60034799, type: 3}
+    - {fileID: 1875113685, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: -387927607, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: 1494059000, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: 805875283, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: -709454753, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: -1843257731, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: -1015942581, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: -703255775, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: 1561787530, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
+    - {fileID: 1906558457, guid: 0d3e36b5fec92c542a041e2eb23f9aa3, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -92,4 +92,25 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0.3
+    functionName: Event_DashState_AllowInterrupt
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.5
+    functionName: Event_DashState_AllowNewDash
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.9
+    functionName: Event_DashState_EndDash
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

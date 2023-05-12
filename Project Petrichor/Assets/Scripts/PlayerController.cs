@@ -6,133 +6,117 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     // Stuff for collision detection and movement
-    public float                movementSpeed       = 1f;
-    public float                collisionOffset     = 0.01f;
-    public ContactFilter2D      movementFilter;
-    private List<RaycastHit2D>  castCollisions      = new List<RaycastHit2D>();
-    private Vector2             inputVector;
-    private Vector2             lastInputVector     = Vector2.down;
-    private Vector2             movementVector;
-    private Vector2             relativeMousePos    = Vector2.zero;
+    [SerializeField] private float collisionOffset = 0.05f;
+    [SerializeField] private ContactFilter2D movementFilter;
+    private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
 
-    private bool                isMovementLocked    = false;
-    private bool                canInterruptCurrentAnimation = true;
-    private bool                isTryInterrupt      = false;
-    private bool                isInRecovery        = false;
+    // Movement params
+    //[SerializeField] private float MaxVelocity = 10f;
+    [SerializeField] private float MovementSpeed = 1f;
+    [SerializeField] private float VelocityDecayRate = 4f;
+    [SerializeField] private float DashSpeed = 3f;
+
+    private Vector2 velocityVector = Vector2.zero;
+
+    // input vectors
+    private Vector2 inputVector;
+    private Vector2 lastInputVector = Vector2.down;
+    private Vector2 relativeMousePos = Vector2.zero;
+
+    // general animation
+    private bool isMovementLocked = false;
+    private bool canInterruptCurrentAnimation = true;
+
+    // avility animation
+    private bool isDashing = false;
+    private Sword sword;
 
     // Game object components
-    private Rigidbody2D         playerRigidBody;
-    private Animator            animator;
-    private Transform           playerSword;
-
-
-    // parameters for sword attacks
-    private bool                isSwordAttacking        = false;
-    private bool                isSwordAttackQueued     = false;
-    private int                 swordAttackNumber       = 1;
-    private Vector2             swordAttackDirection    = Vector2.zero;
-
-    // parameters for other actions
-    private bool                isDeflecting    = false;
-    private bool                isDashing       = false;
-
-
-    private SwordAttackHandler  swordAttackHandler;
-
+    private Rigidbody2D playerRigidBody;
+    private Animator animator;
 
     // Start is called before the first frame update
     void Start()
     {
-        swordAttackHandler = new SwordAttackHandler();
-
-        inputVector             = Vector2.zero;
+        inputVector = Vector2.zero;
 
         playerRigidBody = GetComponent<Rigidbody2D>();
-        animator        = GetComponent<Animator>();
-        //spriteRenderer  = GetComponent<SpriteRenderer>();
-        playerSword     = transform.Find("Sword");
+        animator = GetComponent<Animator>();
+        sword = transform.Find("Sword").GetComponent<Sword>();
     }
 
 
     private void FixedUpdate()
     {
-        // if we have an instance but are not attacking yet
-        if (swordAttackHandler.HasRunningInstance() && !isSwordAttacking && canInterruptCurrentAnimation)
-        {
-            isSwordAttacking = true;
-            SwordAttack();
-        }
-        // always maintain understanding of queue
-        isSwordAttackQueued = swordAttackHandler.HasQueuedInstance();
-        
+        // handle old velocity first
+        velocityVector += (Vector2.zero - velocityVector.normalized) * Mathf.Min(VelocityDecayRate * Time.fixedDeltaTime, velocityVector.magnitude);
+        if (velocityVector.magnitude < 0.01f) { velocityVector = Vector2.zero; }
+        Debug.Log(velocityVector.magnitude);
+
+        MovePlayer(velocityVector.normalized, velocityVector.magnitude);
+
+
 
         // If there is input and sword is not swinging
-        if (inputVector != Vector2.zero && !isMovementLocked) 
-        { 
-            movementVector = MovePlayer(inputVector); 
+        if (inputVector != Vector2.zero && !isMovementLocked && canInterruptCurrentAnimation)
+        {
+            //movementVector = MovePlayer(inputVector, movementSpeed); 
+            velocityVector = inputVector * MovementSpeed;
             lastInputVector = inputVector;
-        } 
-        else { movementVector = Vector2.zero; }
+        }
 
-        //if (canInterruptCurrentAnimation && inputVector != Vector2.zero)
-        //{
-        //    isTryInterrupt = true;
-        //}
-        // Always
         AnimateMovement();
-        AnimateSwordAttack();
+
+        // Dashing
+        if (isDashing && canInterruptCurrentAnimation)
+        {
+            AnimateDash();
+        }
+
+        if (sword.isAttacking && canInterruptCurrentAnimation)
+        {
+            AnimateSwordAttack();
+        }
+
     }
 
-    private void SwordAttack()
-    {
-        // update values
-        SwordAttackInstance instance = swordAttackHandler.GetRunningInstance();
-        swordAttackNumber = instance.attackNum;
-        swordAttackDirection = instance.direction;
-        // run sword animation
-        playerSword.GetComponent<SwordAttack>().AttackWithSword(instance.direction, instance.attackNum);
-        // lock movement and interrupt
-        isMovementLocked = true;
-        canInterruptCurrentAnimation = false;
-        // set idle direction
-        //lastInputVector = swordAttackDirection;
-    }
-
-
-    private Vector2 MovePlayer(Vector2 direction)
+    private Vector2 MovePlayer(Vector2 direction, float speed)
     {
         Vector2 newDir = new Vector2(0, 0);
         // Check for potential collisions
-        int count = RigidbodyRaycast(direction);
-        
+        int count = RigidbodyRaycast(direction, speed);
+
         if (count == 0)
         {
             // If there were no collisions, continue as normal
-            newDir = direction * movementSpeed * Time.fixedDeltaTime;
-        } 
-        else 
+            newDir = direction * speed * Time.fixedDeltaTime;
+        }
+        else
         {
             // There was a collision, try each direction
-            int countX = RigidbodyRaycast(new Vector2(direction.x, 0));
-            int countY = RigidbodyRaycast(new Vector2(0, direction.y));
-            if (countX == 0) {
-                newDir = new Vector2(direction.x, 0) * movementSpeed * Time.fixedDeltaTime;
-            } else if (countY == 0) {
-                newDir = new Vector2(0, direction.y) * movementSpeed * Time.fixedDeltaTime;
+            int countX = RigidbodyRaycast(new Vector2(direction.x, 0), (Mathf.Abs(direction.x) * speed));
+            int countY = RigidbodyRaycast(new Vector2(0, direction.y), (Mathf.Abs(direction.y) * speed));
+            if (countX == 0)
+            {
+                newDir = new Vector2(direction.x, 0) * (Mathf.Abs(direction.x) * speed) * Time.fixedDeltaTime;
+            }
+            else if (countY == 0)
+            {
+                newDir = new Vector2(0, direction.y) * (Mathf.Abs(direction.y) * speed) * Time.fixedDeltaTime;
             }
         }
         playerRigidBody.MovePosition(playerRigidBody.position + newDir);
         return newDir;
     }
-    
+
     // THIS IS A HELPER FUNCTION TO: MovePlayer()
-    private int RigidbodyRaycast(Vector2 direction) 
+    private int RigidbodyRaycast(Vector2 direction, float speed)
     {
         return playerRigidBody.Cast(
             direction, // X, Y; from -1 to 1. direction from body to look for collisions
             movementFilter, // Settings to determine where collisions can occur (layer)
             castCollisions, // List of collisions to store found collisions after cast is called
-            movementSpeed * Time.fixedDeltaTime + collisionOffset // Distance of raycast. Equals movement plus an offset value.
+            speed * Time.fixedDeltaTime + collisionOffset // Distance of raycast. Equals movement plus an offset value.
         );
     }
 
@@ -141,11 +125,11 @@ public class PlayerController : MonoBehaviour
         inputVector = context.ReadValue<Vector2>();
     }
 
-    public void OnFire(InputAction.CallbackContext context) 
+    public void OnFire(InputAction.CallbackContext context)
     {
-        if (context.started) 
+        if (context.started)
         {
-            swordAttackHandler.addSwordAttack(relativeMousePos);
+            sword.AddAttack(relativeMousePos);
         }
         else if (context.performed) { }
         else if (context.canceled) { }
@@ -158,61 +142,53 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-
+        if (context.started)
+        {
+            isDashing = true;
+        }
     }
 
-    private void AnimateMovement() {
-
+    private void AnimateMovement()
+    {
         // Set params for Idle animations
-        animator.SetFloat("lastMoveX", lastInputVector.x);
-        animator.SetFloat("lastMoveY", lastInputVector.y);
+        animator.SetFloat("facing_x", lastInputVector.x);
+        animator.SetFloat("facing_y", lastInputVector.y);
 
         // Set params for Running
-        animator.SetFloat("moveX", movementVector.x);
-        animator.SetFloat("moveY", movementVector.y);
-        animator.SetFloat("moveMagnitude", movementVector.magnitude);
-        animator.SetFloat("inputMoveMagnitude", inputVector.magnitude);
+        animator.SetFloat("velocity_x", velocityVector.x);
+        animator.SetFloat("velocity_y", velocityVector.y);
+        animator.SetFloat("velocity_magnitude", velocityVector.magnitude);
 
-        // Set params for interruption
-        //animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
-        //animator.SetBool("isTryInterrupt", isTryInterrupt);
-        //if (isTryInterrupt)
-        //{
-        //    animator.SetTrigger("interruptTrigger");
-        //}
+        animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
     }
 
     private void AnimateSwordAttack()
     {
-        if (isSwordAttacking)
-        {
-            setLastRelativeMousePos(swordAttackHandler.GetRunningInstance().direction);
-        }
-
-        animator.SetBool("isSwordAttacking", isSwordAttacking);
-        animator.SetInteger("swordAttackNum", swordAttackNumber);
-        animator.SetBool("isSwordAttackQueued", isSwordAttackQueued);
         animator.SetBool("canInterrupt", canInterruptCurrentAnimation);
 
-        
+        sword.isAttacking = false;
+        isMovementLocked = true;
+        canInterruptCurrentAnimation = false;
+        lastInputVector = sword.dir;
 
-        // if we are trying another attack
-        if (canInterruptCurrentAnimation && isSwordAttackQueued)
-        {
-            // end the current attack
-            swordAttackHandler.RemoveRunningInstance();
-            isSwordAttacking = false;
-            isSwordAttackQueued = false;
-        }
+        animator.SetTrigger("t_swordAttack");
+        animator.SetInteger("swordAttack_num", sword.num);
+        animator.SetFloat("swordAttack_dir_x", sword.dir.x);
+        animator.SetFloat("swordAttack_dir_y", sword.dir.y);
+
+        sword.SwordAttack();
+        velocityVector = (velocityVector * 0.5f) + sword.dir.normalized * sword.swingMovementSpeed;
     }
 
-    //// HELPER FUNCTION FOR SWORD ANIMATION
-    private void setLastRelativeMousePos(Vector2 dir)
+    private void AnimateDash()
     {
-        
-        animator.SetFloat("lastRelativeMouseX", dir.x);
-        animator.SetFloat("lastRelativeMouseY", dir.y);
-        lastInputVector = dir;
+        canInterruptCurrentAnimation = false;
+        isDashing = false;
+        isMovementLocked = true;
+
+        animator.SetTrigger("t_dash");
+
+        velocityVector = lastInputVector.normalized * DashSpeed;
     }
 
     private void EventEndDash()
@@ -222,15 +198,12 @@ public class PlayerController : MonoBehaviour
 
     private void EventEndSwordAttack()
     {
-        swordAttackHandler.RemoveRunningInstance();
-        isSwordAttacking = false;
-        isSwordAttackQueued = false;
-        animator.SetTrigger("recover");
+        EventUnlockMovement();
     }
 
     private void StartSwordAttack()
     {
-        
+
     }
 
     private void EventEndDeflect()
@@ -256,71 +229,6 @@ public class PlayerController : MonoBehaviour
     private void EventDisableInterruptAnimation()
     {
 
-    }
-
-    private class SwordAttackHandler
-    {
-        SwordAttackInstance[] instances;
-        private int attackNum = 0;
-        private static int maxAttackNum = 2;
-
-        public SwordAttackHandler()
-        {
-            instances = new SwordAttackInstance[2];
-        }
-
-        public void addSwordAttack(Vector2 instanceVector)
-        {
-            if (instances[1] != null)
-            {
-                attackNum = (instances[1].attackNum + 1) % maxAttackNum;
-            }
-            instances[0] = new SwordAttackInstance(instanceVector, attackNum);
-            
-            if (instances[1] == null)
-            {
-                instances[1] = instances[0];
-                instances[0] = null;
-            }
-        }
-
-        public SwordAttackInstance GetRunningInstance()
-        {
-            return instances[1];
-        }
-
-        public SwordAttackInstance GetQueuedInstance()
-        {
-            return instances[0];
-        }
-
-        public void RemoveRunningInstance()
-        {
-            instances[1] = instances[0];
-            instances[0] = null;
-        }
-
-        public bool HasRunningInstance()
-        {
-            return (instances[1] != null);
-        }
-
-        public bool HasQueuedInstance()
-        {
-            return (instances[0] != null);
-        }
-    }
-
-    private class SwordAttackInstance
-    {
-        public Vector2 direction;
-        public int attackNum;
-
-        public SwordAttackInstance(Vector2 dir, int num)
-        {
-            direction = dir;
-            attackNum = num;
-        }
     }
 }
 

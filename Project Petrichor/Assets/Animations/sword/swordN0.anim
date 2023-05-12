@@ -20,13 +20,13 @@ AnimationClip:
   m_PPtrCurves:
   - curve:
     - time: 0
-      value: {fileID: 1123742638, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
+      value: {fileID: 1475229067, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
     - time: 0.1
-      value: {fileID: 1955680066, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
+      value: {fileID: 1152634422, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
     - time: 0.2
-      value: {fileID: -1917141596, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
+      value: {fileID: 401083705, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
     - time: 0.3
-      value: {fileID: 1919156343, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
+      value: {fileID: -50774270, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -46,10 +46,10 @@ AnimationClip:
       customType: 23
       isPPtrCurve: 1
     pptrCurveMapping:
-    - {fileID: 1123742638, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
-    - {fileID: 1955680066, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
-    - {fileID: -1917141596, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
-    - {fileID: 1919156343, guid: 13981846bbfa2094492d3db02f4e0db0, type: 3}
+    - {fileID: 1475229067, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
+    - {fileID: 1152634422, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
+    - {fileID: 401083705, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
+    - {fileID: -50774270, guid: 71ca22c2c78ce4c4fa3379877690d950, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -74,11 +74,4 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events:
-  - time: 0.3
-    functionName: EventEndAttackWithSword
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
+  m_Events: []
