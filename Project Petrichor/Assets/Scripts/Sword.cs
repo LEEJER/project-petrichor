@@ -41,4 +41,12 @@ public class Sword : MonoBehaviour
         animator.SetInteger("attackNum", num);
         animator.SetTrigger("attack");
     }
+
+    public void SwordAttack(Vector2 direction, int number)
+    {
+        animator.SetFloat("dirX", direction.x);
+        animator.SetFloat("dirY", direction.y);
+        animator.SetInteger("attackNum", number);
+        animator.SetTrigger("attack");
+    }
 }
