@@ -223,6 +223,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 339bb7a8-3dcd-4cbe-b068-7756e0213de5
     m_ActionName: Player/MousePosition[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3574010773074144277}
+        m_TargetAssemblyTypeName: PlayerStateMachine, Assembly-CSharp
+        m_MethodName: OnDeflect
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 0a81ffb1-29f7-48dd-ba81-81c4bc65a966
+    m_ActionName: Player/Deflect[/Mouse/rightButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -261,26 +277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97a039e02b4afdb4b8b5a39c2bb02721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collisionOffset: 0.0005
-  _movementFilter:
-    useTriggers: 0
-    useLayerMask: 0
-    useDepth: 0
-    useOutsideDepth: 0
-    useNormalAngle: 0
-    useOutsideNormalAngle: 0
-    layerMask:
-      serializedVersion: 2
-      m_Bits: 0
-    minDepth: 0
-    maxDepth: 0
-    minNormalAngle: 0
-    maxNormalAngle: 0
-  MaxVelocity: 10
-  MovementSpeed: 1
-  VelocityDecayRate: 4.5
-  DashSpeed: 3
-  animator: {fileID: 0}
 --- !u!95 &5297803684062367706
 Animator:
   serializedVersion: 5

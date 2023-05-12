@@ -3,44 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAttackState : PlayerState
+public class PlayerDeflectHitState : PlayerState
 {
     private bool        canBufferInput  = false;
     private bool        canInterrupt    = false;
-    private bool        startAttack     = false;
-    private int         attackNum       = 0;
+    private bool        startDeflectHit = false;
     private Vector2     dir             = Vector2.zero;
     private NextState   startNext       = NextState.Nothing;
-    
 
     public override void EnterState(PlayerStateMachine player)
     {
-        // entering the attack state for the first time
-        attackNum       = 0;
-        startAttack     = true;
         canInterrupt    = true;
-        startNext       = NextState.Nothing;
         canBufferInput  = true;
+        startDeflectHit = true; 
+        startNext       = NextState.Nothing;
+        dir             = player.VelocityVector * -1f;
+        Animate(player);
     }
 
     public override void UpdateState(PlayerStateMachine player)
     {
-        // run the attack
-        if (startAttack && canInterrupt)
+        if (startDeflectHit)
         {
-            dir = player.RelativeMousePos.normalized;
+            canInterrupt = false;
+            canBufferInput = false;
+
             Animate(player);
 
-            canInterrupt    = false;
-            startAttack     = false;
-            canBufferInput  = false;
             startNext = NextState.Nothing;
-
-            player.sword.SwordAttack(dir, attackNum);
-            player.VelocityVector = (player.VelocityVector * 0.5f) + dir.normalized * player.sword.swingMovementSpeed;
-            attackNum = (attackNum + 1) % 2;
         }
-
+        else if (startNext == NextState.Attack && canInterrupt)
+        {
+            player.animator.SetTrigger("t_attack");
+            Interrupt(player, player.AttackState);
+        }
         else if (startNext == NextState.Deflect && canInterrupt)
         {
             player.animator.SetTrigger("t_deflect");
@@ -60,10 +56,9 @@ public class PlayerAttackState : PlayerState
 
     public override void ExitState(PlayerStateMachine player)
     {
-        startAttack     = false;
-        canInterrupt    = true;
-        startNext       = NextState.Nothing;
+        canInterrupt = true;
         canBufferInput = false;
+        startNext = NextState.Nothing;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -80,7 +75,7 @@ public class PlayerAttackState : PlayerState
     {
         if (context.started)
         {
-            if (canBufferInput) { startAttack = true; }
+            if (canBufferInput) { startNext = NextState.Attack; }
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -99,16 +94,29 @@ public class PlayerAttackState : PlayerState
     }
     public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
     {
+        // we can interrupt once the deflect ends
+        // so, if we are still in the deflect animation
+        if (!canInterrupt)
+        {
+            if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("EnemyProjectile"))
+            {
+                startDeflectHit = true;
+                // apply player velocity
+            }
+        }
+        // we are not in the deflect animation
+        else
+        {
 
+        }
     }
 
     private void Animate(PlayerStateMachine player)
     {
         player.FacingVector = dir;
-        player.animator.SetTrigger("t_swordAttack");
-        player.animator.SetInteger("swordAttack_num", attackNum);
-        player.animator.SetFloat("swordAttack_dir_x", dir.x);
-        player.animator.SetFloat("swordAttack_dir_y", dir.y);
+        player.animator.SetTrigger("t_deflect_hit");
+        player.animator.SetFloat("facing_x", dir.x);
+        player.animator.SetFloat("facing_y", dir.y);
     }
 
     private void Interrupt(PlayerStateMachine player, PlayerState state)
@@ -122,7 +130,7 @@ public class PlayerAttackState : PlayerState
         canInterrupt = true;
     }
 
-    public void EventEndSwordAttack(PlayerStateMachine player)
+    public void EventEndDeflectHit(PlayerStateMachine player)
     {
         player.SwitchState(player.IdleState);
     }

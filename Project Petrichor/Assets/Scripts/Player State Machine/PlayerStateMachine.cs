@@ -6,12 +6,13 @@ using UnityEngine.InputSystem;
 public class PlayerStateMachine : MonoBehaviour
 {
     // STATE MACHINE STUFF
-    private PlayerState         _currentState;
-    public  PlayerAttackState   AttackState     = new PlayerAttackState();
-    public  PlayerDashState     DashState       = new PlayerDashState();
-    public  PlayerIdleState     IdleState       = new PlayerIdleState();
-    public  PlayerRunState      RunState        = new PlayerRunState();
-    public  PlayerDeflectState  DeflectState    = new PlayerDeflectState();
+    private PlayerState             _currentState;
+    public  PlayerAttackState       AttackState     = new PlayerAttackState();
+    public  PlayerDashState         DashState       = new PlayerDashState();
+    public  PlayerIdleState         IdleState       = new PlayerIdleState();
+    public  PlayerRunState          RunState        = new PlayerRunState();
+    public  PlayerDeflectState      DeflectState    = new PlayerDeflectState();
+    public  PlayerDeflectHitState   DeflectHitState = new PlayerDeflectHitState();
     // STATE MACHINE STUFF END
 
     // Stuff for collision detection and movement
@@ -110,17 +111,14 @@ public class PlayerStateMachine : MonoBehaviour
         _inputVector = context.ReadValue<Vector2>();
         _currentState.OnMove(this, context);
     }
-
     public void OnFire(InputAction.CallbackContext context)
     {
         _currentState.OnFire(this, context);
     }
-
     public void OnDash(InputAction.CallbackContext context)
     {
         _currentState.OnDash(this, context);
     }
-
     public void OnDeflect(InputAction.CallbackContext context)
     {
         _currentState.OnDeflect(this, context);
@@ -129,7 +127,12 @@ public class PlayerStateMachine : MonoBehaviour
     {
         RelativeMousePos = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>()) - transform.position;
     }
-
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        _currentState.OnCollisionEnter2D(this, collision);
+    }
+    
+    
     public void SwitchState(PlayerState state)
     {
         _currentState.ExitState(this);
@@ -137,28 +140,16 @@ public class PlayerStateMachine : MonoBehaviour
         state.EnterState(this);
     }
 
-    public void Event_AttackState_AllowInterrupt()
-    {
-        AttackState.EventAllowInterrupt();
-    }
-
-    public void Event_AttackState_EndSwordAttack()
-    {
-        AttackState.EventEndSwordAttack(this);
-    }
-
-    public void Event_AttackState_AllowBuffer()
-    {
-        AttackState.EventAllowBuffer();
-    }
-
-    public void Event_DashState_AllowInterrupt()
-    {
-        DashState.EventAllowInterrupt();
-    }
-
-    public void Event_DashState_EndDash()
-    {
-        DashState.EventEndDash(this);
-    }
+    public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt(); }
+    public void Event_AttackState_EndSwordAttack()      { AttackState.EventEndSwordAttack(this); }
+    public void Event_AttackState_AllowBuffer()         { AttackState.EventAllowBuffer(); }
+    public void Event_DashState_AllowInterrupt()        { DashState.EventAllowInterrupt(); }
+    public void Event_DashState_AllowNewDash()          { DashState.EventAllowNewDash(); }
+    public void Event_DashState_EndDash()               { DashState.EventEndDash(this); }
+    public void Event_DeflectState_AllowInterrupt()     { DeflectState.EventAllowInterrupt(); }
+    public void Event_DeflectState_AllowBuffer()        { DeflectState.EventAllowBuffer(); }
+    public void Event_DeflectState_EndDeflect()         { DeflectState.EventEndDeflect(this); }
+    public void Event_DeflectHitState_AllowInterrupt()  { DeflectHitState.EventAllowInterrupt(); }
+    public void Event_DeflectHitState_AllowBuffer()     { DeflectHitState.EventAllowBuffer(); }
+    public void Event_DeflectHitState_EndDeflectHit()   { DeflectHitState.EventEndDeflectHit(this); }
 }

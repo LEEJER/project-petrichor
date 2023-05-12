@@ -50,6 +50,13 @@ public class PlayerIdleState : PlayerState
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
+        if (context.started)
+        {
+            player.SwitchState(player.DeflectState);
+        }
+    }
+    public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    {
 
     }
 

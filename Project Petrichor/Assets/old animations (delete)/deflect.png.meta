@@ -1797,7 +1797,7 @@ TextureImporter:
     nameFileIdTable:
       deflect_42: 1349445972
       deflect_3: 1967890203
-      deflect_79: -228222687
+      deflect_0: -84923412
       deflect_16: 570396812
       deflect_53: 865552411
       deflect_57: -1004166383
@@ -1871,10 +1871,10 @@ TextureImporter:
       deflect_44: 1609982282
       deflect_56: -1336831236
       deflect_21: 137518490
-      deflect_26: 1025547947
-      deflect_17: -1532050552
+      deflect_79: -228222687
       deflect_33: 1254587666
-      deflect_0: -84923412
+      deflect_17: -1532050552
+      deflect_26: 1025547947
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
