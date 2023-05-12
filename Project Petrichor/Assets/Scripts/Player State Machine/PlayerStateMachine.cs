@@ -55,7 +55,7 @@ public class PlayerStateMachine : MonoBehaviour
         _currentState.EnterState(this);
 
         // setup other
-        _animator           = GetComponent<Animator>();
+        _animator           = transform.Find("Sprite").GetComponent<Animator>();
         _playerRigidBody    = GetComponent<Rigidbody2D>();
         _sword              = transform.Find("Sword").GetComponent<Sword>();
     }
@@ -149,6 +149,7 @@ public class PlayerStateMachine : MonoBehaviour
     public void Event_DeflectState_AllowInterrupt()     { DeflectState.EventAllowInterrupt(); }
     public void Event_DeflectState_AllowBuffer()        { DeflectState.EventAllowBuffer(); }
     public void Event_DeflectState_EndDeflect()         { DeflectState.EventEndDeflect(this); }
+    public void Event_DeflectState_RemoveDeflectFrames(){ DeflectState.EventRemoveDeflectFrames(); }
     public void Event_DeflectHitState_AllowInterrupt()  { DeflectHitState.EventAllowInterrupt(); }
     public void Event_DeflectHitState_AllowBuffer()     { DeflectHitState.EventAllowBuffer(); }
     public void Event_DeflectHitState_EndDeflectHit()   { DeflectHitState.EventEndDeflectHit(this); }

@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerDeflectState : PlayerState
 {
+    private bool        deflectFramesActive = false;
     private bool        canBufferInput  = false;
     private bool        canInterrupt    = false;
     private bool        startDeflect    = false;
@@ -13,6 +14,7 @@ public class PlayerDeflectState : PlayerState
     private NextState   startNext       = NextState.Nothing;
     public override void EnterState(PlayerStateMachine player)
     {
+        deflectFramesActive = false;
         startDeflect    = true;
         canInterrupt    = true;
         startDeflectHit = false;
@@ -34,6 +36,7 @@ public class PlayerDeflectState : PlayerState
         }
         else if (startDeflect && canInterrupt)
         {
+            deflectFramesActive = true;
             canInterrupt = false;
             startDeflect = false;
             canBufferInput = false;
@@ -68,6 +71,7 @@ public class PlayerDeflectState : PlayerState
         canInterrupt = true;
         startDeflectHit = false;
         startNext = NextState.Nothing;
+        deflectFramesActive = false;
         canBufferInput = false;
     }
 
@@ -106,7 +110,7 @@ public class PlayerDeflectState : PlayerState
     {
         // we can interrupt once the deflect ends
         // so, if we are still in the deflect animation
-        if (!canInterrupt)
+        if (deflectFramesActive)
         {
             if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("Enemy"))
             {
@@ -148,5 +152,10 @@ public class PlayerDeflectState : PlayerState
     public void EventAllowBuffer()
     {
         canBufferInput = true;
+    }
+
+    public void EventRemoveDeflectFrames()
+    {
+        deflectFramesActive = false;
     }
 }
