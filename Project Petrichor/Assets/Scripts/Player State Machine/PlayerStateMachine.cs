@@ -13,6 +13,7 @@ public class PlayerStateMachine : MonoBehaviour
     public  PlayerRunState          RunState        = new PlayerRunState();
     public  PlayerDeflectState      DeflectState    = new PlayerDeflectState();
     public  PlayerDeflectHitState   DeflectHitState = new PlayerDeflectHitState();
+    public  PlayerHitState          HitState        = new PlayerHitState();
     // STATE MACHINE STUFF END
 
     // Stuff for collision detection and movement
@@ -24,7 +25,8 @@ public class PlayerStateMachine : MonoBehaviour
     //private float _maxVelocity        = 10f;
     private float _movementSpeed      = 1f;
     private float _velocityDecayRate  = 5f;
-    private float _dashSpeed          = 3f;
+    private float _dashSpeed          = 2.5f;
+    private float _selfKnockback      = 0.8f;
 
     Vector2 _velocityVector     = Vector2.zero;
     Vector2 _inputVector        = Vector2.zero;
@@ -35,6 +37,7 @@ public class PlayerStateMachine : MonoBehaviour
     private Animator    _animator;
     private Sword       _sword;
     private Rigidbody2D _playerRigidBody;
+    private Collider2D  _playerCollider;
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  RelativeMousePos    { get { return _relativeMousePos; } set { _relativeMousePos = value; } }
@@ -44,6 +47,7 @@ public class PlayerStateMachine : MonoBehaviour
     public Sword    sword               { get { return _sword; }    private set { _sword = value; } }
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
     public float    DashSpeed           { get { return _dashSpeed; }        set { _dashSpeed = value; } }
+    public float    SelfKnockback       { get { return _selfKnockback; }    set { _selfKnockback = value; } }
     //public float    MaxVelocity         { get { return _maxVelocity; }      set { _maxVelocity = value; } }
 
 
@@ -57,7 +61,12 @@ public class PlayerStateMachine : MonoBehaviour
         // setup other
         _animator           = transform.Find("Sprite").GetComponent<Animator>();
         _playerRigidBody    = GetComponent<Rigidbody2D>();
+        _playerCollider     = GetComponent<Collider2D>();
         _sword              = transform.Find("Sword").GetComponent<Sword>();
+
+        _movementFilter = new ContactFilter2D();
+        _movementFilter.SetLayerMask(LayerMask.GetMask("Environment"));
+        _movementFilter.useLayerMask = true;
     }
 
     private void FixedUpdate()
@@ -68,11 +77,11 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void MovePlayerBasedOnVelocity()
     {
-        // Velocity decay
-        _velocityVector += (Vector2.zero - _velocityVector.normalized) * Mathf.Min(_velocityDecayRate * Time.fixedDeltaTime, _velocityVector.magnitude);
-        if (_velocityVector.magnitude < 0.01f) { _velocityVector = Vector2.zero; }
         // Actually move
         MovePlayer(_velocityVector.normalized, _velocityVector.magnitude);
+        // Velocity decay
+        _velocityVector -= (_velocityVector.normalized) * Mathf.Min(_velocityDecayRate * Time.fixedDeltaTime, _velocityVector.magnitude);
+        if (_velocityVector.magnitude < 0.01f) { _velocityVector = Vector2.zero; }
     }
 
     private Vector2 MovePlayer(Vector2 direction, float speed)
@@ -98,11 +107,12 @@ public class PlayerStateMachine : MonoBehaviour
 
     private int RigidbodyRaycast(Vector2 direction, float speed)
     {
-        return _playerRigidBody.Cast(
+        return _playerCollider.Cast(
             direction, // X, Y; from -1 to 1. direction from body to look for collisions
             _movementFilter, // Settings to determine where collisions can occur (layer)
             _castCollisions, // List of collisions to store found collisions after cast is called
-            speed * Time.fixedDeltaTime + _collisionOffset // Distance of raycast. Equals movement plus an offset value.
+            speed * Time.fixedDeltaTime + _collisionOffset, // Distance of raycast. Equals movement plus an offset value.
+            true
         );
     }
 
@@ -140,17 +150,23 @@ public class PlayerStateMachine : MonoBehaviour
         state.EnterState(this);
     }
 
-    public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt(); }
-    public void Event_AttackState_EndSwordAttack()      { AttackState.EventEndSwordAttack(this); }
-    public void Event_AttackState_AllowBuffer()         { AttackState.EventAllowBuffer(); }
-    public void Event_DashState_AllowInterrupt()        { DashState.EventAllowInterrupt(); }
-    public void Event_DashState_AllowNewDash()          { DashState.EventAllowNewDash(); }
-    public void Event_DashState_EndDash()               { DashState.EventEndDash(this); }
-    public void Event_DeflectState_AllowInterrupt()     { DeflectState.EventAllowInterrupt(); }
-    public void Event_DeflectState_AllowBuffer()        { DeflectState.EventAllowBuffer(); }
-    public void Event_DeflectState_EndDeflect()         { DeflectState.EventEndDeflect(this); }
-    public void Event_DeflectState_RemoveDeflectFrames(){ DeflectState.EventRemoveDeflectFrames(); }
-    public void Event_DeflectHitState_AllowInterrupt()  { DeflectHitState.EventAllowInterrupt(); }
-    public void Event_DeflectHitState_AllowBuffer()     { DeflectHitState.EventAllowBuffer(); }
+    public void AddVelocity(Vector2 vel)
+    {
+        _velocityVector += vel;
+    }
+
+    public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt();        }
+    public void Event_AttackState_EndSwordAttack()      { AttackState.EventEndSwordAttack(this);    }
+    public void Event_AttackState_AllowBuffer()         { AttackState.EventAllowBuffer(this);       }
+    public void Event_DashState_AllowInterrupt()        { DashState.EventAllowInterrupt();          }
+    public void Event_DashState_AllowNewDash()          { DashState.EventAllowNewDash();            }
+    public void Event_DashState_EndDash()               { DashState.EventEndDash(this);             }
+    public void Event_DeflectState_AllowInterrupt()     { DeflectState.EventAllowInterrupt();       }
+    public void Event_DeflectState_AllowBuffer()        { DeflectState.EventAllowBuffer();          }
+    public void Event_DeflectState_EndDeflect()         { DeflectState.EventEndDeflect(this);       }
+    public void Event_DeflectState_RemoveDeflectFrames(){ DeflectState.EventRemoveDeflectFrames();  }
+    public void Event_DeflectHitState_AllowInterrupt()  { DeflectHitState.EventAllowInterrupt();    }
+    public void Event_DeflectHitState_AllowBuffer()     { DeflectHitState.EventAllowBuffer();       }
     public void Event_DeflectHitState_EndDeflectHit()   { DeflectHitState.EventEndDeflectHit(this); }
+    public void Event_HitState_AllowInterrupt()         { HitState.EventAllowInterrupt(this);       }
 }

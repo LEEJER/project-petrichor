@@ -127,8 +127,10 @@ public class PlayerAttackState : PlayerState
         player.SwitchState(player.IdleState);
     }
 
-    public void EventAllowBuffer()
+    public void EventAllowBuffer(PlayerStateMachine player)
     {
         canBufferInput = true;
     }
+
+    
 }

@@ -14,10 +14,9 @@ GameObject:
   - component: {fileID: 1431366473275706345}
   - component: {fileID: 3466645404516429310}
   - component: {fileID: 5190121621737360945}
-  - component: {fileID: 2252184616667662657}
   - component: {fileID: 5190121621737360946}
   - component: {fileID: 5190121621737360947}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -300,22 +299,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!58 &2252184616667662657
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3126387061210021522}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.04
 --- !u!70 &5190121621737360946
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -355,7 +338,8 @@ GameObject:
   - component: {fileID: 4836639989814714268}
   - component: {fileID: 5125162994201635763}
   - component: {fileID: 2252184615077287866}
-  m_Layer: 0
+  - component: {fileID: 1077794767}
+  m_Layer: 7
   m_Name: Sword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -461,10 +445,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dfaa29d3f53b0c4abf02006652815cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 1
   isAttacking: 0
   num: 0
   dir: {x: 0, y: 0}
   swingMovementSpeed: 1.45
+  knockbackForce: 3
+--- !u!58 &1077794767
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3810739646586499219}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.15, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.25
 --- !u!1 &4358281715331724101
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,7 +479,7 @@ GameObject:
   - component: {fileID: 4358281715331724104}
   - component: {fileID: 4358281715331724103}
   - component: {fileID: 4358281715331724105}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

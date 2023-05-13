@@ -20,6 +20,7 @@ public class PlayerDeflectState : PlayerState
         startDeflectHit = false;
         startNext       = NextState.Nothing;
         canBufferInput = true;
+        dir = player.RelativeMousePos.normalized;
     }
 
     public override void UpdateState(PlayerStateMachine player)
@@ -42,7 +43,7 @@ public class PlayerDeflectState : PlayerState
             canBufferInput = false;
             //startDeflectHit = false;
 
-            dir = player.RelativeMousePos.normalized;
+            
             Animate(player);
 
             startNext = NextState.Nothing;
@@ -103,7 +104,10 @@ public class PlayerDeflectState : PlayerState
     {
         if (context.started)
         {
-            if (canBufferInput) { startDeflect = true; }
+            if (canBufferInput) { 
+                startDeflect = true;
+                dir = player.RelativeMousePos.normalized;
+            }
         }
     }
     public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
@@ -128,6 +132,8 @@ public class PlayerDeflectState : PlayerState
     private void Animate(PlayerStateMachine player)
     {
         player.FacingVector = dir;
+        player.animator.SetFloat("facing_x", dir.x);
+        player.animator.SetFloat("facing_y", dir.y);
         player.animator.SetTrigger("t_deflect");
         player.animator.SetFloat("swordAttack_dir_x", dir.x);
         player.animator.SetFloat("swordAttack_dir_y", dir.y);
