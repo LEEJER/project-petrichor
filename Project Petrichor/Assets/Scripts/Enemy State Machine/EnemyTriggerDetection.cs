@@ -27,4 +27,9 @@ public class EnemyTriggerDetection : MonoBehaviour
     {
         enemy.OnDetectionBoxStay(collision);
     }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        enemy.OnDetectionBoxExit(collision);
+    }
 }

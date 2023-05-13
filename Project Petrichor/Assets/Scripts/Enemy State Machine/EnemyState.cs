@@ -21,9 +21,9 @@ public abstract class EnemyState
 
     public abstract void ExitState(EnemyStateMachine enemy);
 
-    public abstract void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D col);
-    public abstract void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D col);
-    public abstract void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D col);
+    public abstract void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision);
+    public abstract void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision);
+    public abstract void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision);
 
     public abstract void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push);
 }

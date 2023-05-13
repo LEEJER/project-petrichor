@@ -30,23 +30,23 @@ public class EnemyIdleState : EnemyState
         nextState = NextState.Nothing;
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision)
     {
-        if (col.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             nextState = NextState.Chase;
         }
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision)
     {
-        if (col.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             nextState = NextState.Chase;
         }
     }
 
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision)
     {
 
     }

@@ -19,16 +19,16 @@ public class EnemyAttackState : EnemyState
 
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision)
     {
 
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision)
     {
 
     }
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D col)
+    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision)
     {
 
     }

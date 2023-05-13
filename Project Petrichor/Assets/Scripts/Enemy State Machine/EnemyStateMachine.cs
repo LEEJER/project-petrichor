@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class EnemyStateMachine : MonoBehaviour
 {
@@ -18,25 +19,35 @@ public class EnemyStateMachine : MonoBehaviour
 
     // Movement params
     //private float _maxVelocity        = 10f;
-    private float _movementSpeed        = 1f;
-    private float _velocityDecayRate    = 8f;
+    private float   _movementSpeed      = 1f;
+    private float   _velocityDecayRate  = 8f;
+    private float   _chaseSpeed         = 1.1f;
 
-    Vector2 _velocityVector = Vector2.zero;
-    Vector2 _facingVector   = Vector2.down;
+    private Vector2 _velocityVector     = Vector2.zero;
+    private Vector2 _facingVector       = Vector2.down;
 
     // Game object components
-    private Animator        _animator;
-    private Collider2D      _enemyCollider;
-    private Rigidbody2D     _enemyRigidbody;
+    private Animator    _animator;
+    private Collider2D  _enemyCollider;
+    private Rigidbody2D _enemyRigidbody;
 
     // game values
-    private float _health;
-    private float _maxHealth = 3f;
+    private float   _health;
+    private float   _maxHealth  = 3f;
 
-    public Vector2  FacingVector { get { return _facingVector; } set { _facingVector = value; } }
-    public Vector2  VelocityVector { get { return _velocityVector; } set { _velocityVector = value; } }
-    public Animator animator { get { return _animator; } private set { _animator = value; } }
-    public float    MovementSpeed { get { return _movementSpeed; } set { _movementSpeed = value; } }
+    // pathfinding
+    private Vector2 _pathfindingTarget;
+    private float   _nextWaypointDistance = 0.2f;
+    private Path    _path;
+    private int     _currentWaypoint;
+    private bool    _reachedEndOfPath;
+    private Seeker  _seeker;
+
+    public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
+    public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
+    public Animator animator            { get { return _animator; } private set { _animator = value; } }
+    public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
+    public float    ChaseSpeed          { get { return _chaseSpeed; }       set { _chaseSpeed = value; } }
     public float    Health
     {
         get { return _health; }
@@ -48,11 +59,16 @@ public class EnemyStateMachine : MonoBehaviour
         }
     }
 
+    public Vector2  PathfindingTarget       { get { return _pathfindingTarget; }    set { _pathfindingTarget = value; } }
+    public float    NextWaypointDistance    { get { return _nextWaypointDistance; } set { _nextWaypointDistance = value; } }
+    public Path     Path                    { get { return _path; }                 set { _path = value; } }
+    public int      CurrentWaypoint         { get { return _currentWaypoint; }      set { _currentWaypoint = value; } }
+    public bool     ReachedEndOfPath        { get { return _reachedEndOfPath; }     set { _reachedEndOfPath = value; } }
+    public Seeker   seeker                  { get { return _seeker; }               set { _seeker = value; } }
+    public Rigidbody2D EnemyRigidbody       { get { return _enemyRigidbody; }       set { _enemyRigidbody = value; } }
+
     private void Start()
     {
-        _currentState = IdleState;
-        _currentState.EnterState(this);
-
         _animator = transform.Find("Sprite").GetComponent<Animator>();
         _enemyCollider = GetComponent<Collider2D>();
         _enemyRigidbody = GetComponent<Rigidbody2D>();
@@ -62,6 +78,11 @@ public class EnemyStateMachine : MonoBehaviour
         _movementFilter.useLayerMask = true;
 
         _health = _maxHealth;
+
+        _seeker = GetComponent<Seeker>();
+
+        _currentState = IdleState;
+        _currentState.EnterState(this);
     }
 
     private void FixedUpdate()
@@ -131,6 +152,23 @@ public class EnemyStateMachine : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void FindPathTo(Vector2 location)
+    {
+        if (seeker.IsDone())
+        {
+            seeker.StartPath(_enemyRigidbody.position, location, OnPathComplete);
+        }
+    }
+
+    private void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            _path = p;
+            _currentWaypoint = 0;
+        }
+    }
+
     public void OnDetectionBoxEnter(Collider2D collision)
     {
         _currentState.OnDetectionBoxEnter(this, collision);
@@ -139,5 +177,10 @@ public class EnemyStateMachine : MonoBehaviour
     public void OnDetectionBoxStay(Collider2D collision)
     {
         _currentState.OnDetectionBoxStay(this, collision);
+    }
+
+    public void OnDetectionBoxExit(Collider2D collision)
+    {
+        _currentState.OnDetectionBoxExit(this, collision);
     }
 }
