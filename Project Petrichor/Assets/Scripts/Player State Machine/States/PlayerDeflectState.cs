@@ -5,17 +5,18 @@ using UnityEngine.InputSystem;
 
 public class PlayerDeflectState : PlayerState
 {
-    private bool        deflectFramesActive = false;
     private bool        canBufferInput  = false;
     private bool        canInterrupt    = false;
     private bool        startDeflect    = false;
     private bool        startDeflectHit = false;
     private Vector2     dir             = Vector2.zero;
     private NextState   startNext       = NextState.Nothing;
+
+    private Collider2D deflectBox;
     public override void EnterState(PlayerStateMachine player)
     {
+        deflectBox = player.transform.Find("DeflectBox").GetComponent<Collider2D>();
         player.currentState = PlayerStateMachine.CurrentState.Deflect;
-        deflectFramesActive = false;
         startDeflect    = true;
         canInterrupt    = true;
         startDeflectHit = false;
@@ -38,7 +39,7 @@ public class PlayerDeflectState : PlayerState
         }
         else if (startDeflect && canInterrupt)
         {
-            deflectFramesActive = true;
+            deflectBox.enabled = true;
             canInterrupt = false;
             startDeflect = false;
             canBufferInput = false;
@@ -73,8 +74,8 @@ public class PlayerDeflectState : PlayerState
         canInterrupt = true;
         startDeflectHit = false;
         startNext = NextState.Nothing;
-        deflectFramesActive = false;
         canBufferInput = false;
+        deflectBox.enabled = false;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -150,7 +151,17 @@ public class PlayerDeflectState : PlayerState
                 // apply self knockback
                 // interrupt attacks
                 // goto hit state
-                Debug.Log("Player was hit by enemy in HitState");
+                if (!deflectBox.enabled)
+                {
+                    Debug.Log("Player was hit by enemy in DeflectState");
+                }
+            }
+        }
+        else if (selfComponent == "DeflectBox")
+        {
+            if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
+            {
+                Debug.Log("deflected");
             }
         }
     }
@@ -196,6 +207,6 @@ public class PlayerDeflectState : PlayerState
 
     public void EventRemoveDeflectFrames()
     {
-        deflectFramesActive = false;
+        deflectBox.enabled = false;
     }
 }

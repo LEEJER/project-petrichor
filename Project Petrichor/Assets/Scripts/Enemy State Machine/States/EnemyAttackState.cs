@@ -7,8 +7,9 @@ public class EnemyAttackState : EnemyState
     NextState nextState = NextState.Nothing;
     private bool startAttack = false;
     private float time = 0f;
-    private float maxTime = 1f;
+    private float maxTime = 0.6f;
     private bool cooldown = false;
+    Collider2D hurtbox;
 
     public override void EnterState(EnemyStateMachine enemy)
     {
@@ -16,6 +17,7 @@ public class EnemyAttackState : EnemyState
         nextState = NextState.Nothing;
         startAttack = true;
         cooldown = false;
+        hurtbox = enemy.transform.Find("Hurtbox").GetComponent<Collider2D>();
     }
 
     public override void UpdateState(EnemyStateMachine enemy)
@@ -48,6 +50,7 @@ public class EnemyAttackState : EnemyState
             time = 0;
             if (!cooldown)
             {
+                hurtbox.enabled = true;
                 enemy.VelocityVector = (enemy.PathfindingTarget - enemy.EnemyRigidbody.position).normalized * 3f;
                 cooldown = true;
                 time += Time.fixedDeltaTime;
@@ -56,6 +59,7 @@ public class EnemyAttackState : EnemyState
             }
             else
             {
+                hurtbox.enabled = false;
                 cooldown = false;
             }
         }
@@ -67,6 +71,7 @@ public class EnemyAttackState : EnemyState
         startAttack = false;
         cooldown = false;
         time = 0;
+        hurtbox.enabled = false;
     }
 
     public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
