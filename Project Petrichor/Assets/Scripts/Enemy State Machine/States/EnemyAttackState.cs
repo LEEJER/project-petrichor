@@ -25,7 +25,7 @@ public class EnemyAttackState : EnemyState
         switch (nextState)
         {
             case NextState.Chase:
-                if (!cooldown) { enemy.SwitchState(enemy.ChaseState); }
+                enemy.SwitchState(enemy.ChaseState);
                 break;
             case NextState.Hit:
                 enemy.SwitchState(enemy.HitState);
@@ -55,10 +55,10 @@ public class EnemyAttackState : EnemyState
                 cooldown = true;
                 time += Time.fixedDeltaTime;
                 // automatically go into the chase state after finishing an attack
-                nextState = NextState.Chase;
             }
             else
             {
+                nextState = NextState.Chase;
                 hurtbox.enabled = false;
                 cooldown = false;
             }
@@ -80,26 +80,41 @@ public class EnemyAttackState : EnemyState
         // if our hitbox was hit
         if (selfComponent == "Hitbox")
         {
-            // if we are hit by the player hurtbox
-            if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
+            // if we are hit by the player
+            if (other.layer == LayerMask.NameToLayer("Player"))
             {
-                Sword sword = other.GetComponent<Sword>();
-                // take damage
-                enemy.Health -= sword.damage;
-                
-                // if we just lunged and are in recovery
-                if (cooldown)
+                // it was the player's sword
+                if (other.CompareTag("Hurtbox"))
                 {
-                    // take knockback
-                    enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
-                    cooldown = false;
-                    // goto hit state
-                    nextState = NextState.Hit;
+                    Sword sword = other.GetComponent<Sword>();
+                    // take damage
+                    enemy.Health -= sword.damage;
+
+                    // if we just lunged and are in recovery
+                    if (cooldown || enemy.Health <= 0)
+                    {
+                        // take knockback
+                        enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                        cooldown = false;
+                        // goto hit state
+                        nextState = NextState.Hit;
+                    }
                 }
             }
         }
+        else if (selfComponent == "Hurtbox")
+        {
+            if (other.layer == LayerMask.NameToLayer("Player"))
+            {
+                if (other.CompareTag("DeflectBox"))
+                {
+                    nextState = NextState.Hit;
+                    hurtbox.enabled = false;
+                    enemy.VelocityVector = -enemy.VelocityVector.normalized * other.transform.parent.GetComponent<PlayerStateMachine>().DeflectKnockback;
+                }
 
-        
+            }
+        }
     }
 
     public override void OnHitboxStay(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
@@ -110,11 +125,4 @@ public class EnemyAttackState : EnemyState
     {
 
     }
-
-    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    //{
-    //    enemy.Health -= damage;
-    //    enemy.VelocityVector += push;
-    //    nextState = NextState.Hit;
-    //}
 }

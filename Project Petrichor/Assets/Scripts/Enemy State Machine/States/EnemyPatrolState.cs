@@ -53,11 +53,4 @@ public class EnemyPatrolState : EnemyState
     {
 
     }
-
-    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    //{
-    //    enemy.Health -= damage;
-    //    enemy.VelocityVector += push;
-    //    nextState = NextState.Hit;
-    //}
 }

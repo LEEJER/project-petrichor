@@ -67,29 +67,4 @@ public class Sword : MonoBehaviour
         animator.SetInteger("attackNum", number);
         animator.SetTrigger("attack");
     }
-
-    //private void OnTriggerEnter2D(Collider2D other)
-    //{
-    //    GameObject _other = other.gameObject;
-    //    if (_other != null)
-    //    {
-    //        if (other.CompareTag("Hitbox"))
-    //        {
-    //            EnemyStateMachine enemyScript = _other.GetComponent<EnemyStateMachine>();
-    //        }
-    //    }
-    //    if (other.CompareTag("Enemy"))
-    //    {
-    //        GameObject enemy = other.gameObject;
-    //        if (enemy != null)
-    //        {
-    //            EnemyStateMachine enemyScript = enemy.GetComponent<EnemyStateMachine>();
-    //            bool hit = enemyScript.TakeDamage(damage, dir.normalized * knockbackForce);
-    //            if (hit)
-    //            {
-    //                playerScript.VelocityVector += -1f * dir.normalized * (knockbackForce/1.5f);
-    //            }
-    //        }
-    //    } 
-    //}
 }

@@ -93,24 +93,6 @@ public class PlayerDeflectHitState : PlayerState
             if (canBufferInput) { startNext = NextState.Deflect; }
         }
     }
-    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
-    //{
-    //    // we can interrupt once the deflect ends
-    //    // so, if we are still in the deflect animation
-    //    if (!canInterrupt)
-    //    {
-    //        if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("EnemyProjectile"))
-    //        {
-    //            startDeflectHit = true;
-    //            // apply player velocity
-    //        }
-    //    }
-    //    // we are not in the deflect animation
-    //    else
-    //    {
-
-    //    }
-    //}
 
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
@@ -124,7 +106,6 @@ public class PlayerDeflectHitState : PlayerState
                 // apply self knockback
                 // interrupt attacks
                 // goto hit state
-                Debug.Log("Player was hit by enemy in DeflectHitState");
             }
         }
     }

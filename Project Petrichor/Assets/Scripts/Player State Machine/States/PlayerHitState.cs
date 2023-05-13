@@ -37,10 +37,7 @@ public class PlayerHitState : PlayerState
     {
 
     }
-    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
-    //{
 
-    //}
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
 

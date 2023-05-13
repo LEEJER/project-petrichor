@@ -120,13 +120,6 @@ public class EnemyChaseState : EnemyState
         }
     }
 
-    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    //{
-    //    enemy.Health -= damage;
-    //    enemy.VelocityVector += push;
-    //    nextState = NextState.Hit;
-    //}
-
     private bool CanSeePlayer(EnemyStateMachine enemy)
     {
         ContactFilter2D contactFilter = new ContactFilter2D();

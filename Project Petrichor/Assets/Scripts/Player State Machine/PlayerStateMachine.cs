@@ -41,6 +41,8 @@ public class PlayerStateMachine : StateMachine
     private float _dashSpeed          = 2.5f;
     private float _selfKnockback      = 0.8f;
 
+    private float _deflectKnockback   = 2.2f;
+
     Vector2 _velocityVector     = Vector2.zero;
     Vector2 _inputVector        = Vector2.zero;
     Vector2 _relativeMousePos   = Vector2.zero;
@@ -61,6 +63,7 @@ public class PlayerStateMachine : StateMachine
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
     public float    DashSpeed           { get { return _dashSpeed; }        set { _dashSpeed = value; } }
     public float    SelfKnockback       { get { return _selfKnockback; }    set { _selfKnockback = value; } }
+    public float    DeflectKnockback    { get { return _deflectKnockback; } set { _deflectKnockback = value; } }
     //public float    MaxVelocity         { get { return _maxVelocity; }      set { _maxVelocity = value; } }
 
 

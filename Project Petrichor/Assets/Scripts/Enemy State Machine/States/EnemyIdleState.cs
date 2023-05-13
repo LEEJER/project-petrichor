@@ -33,27 +33,6 @@ public class EnemyIdleState : EnemyState
 
     public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
-        //GameObject other = collision.gameObject;
-        //// if we touch the player
-        //if (other.layer == LayerMask.NameToLayer("Player"))
-        //{
-        //    // specifically the hurtbox
-        //    if (other.CompareTag("Hurtbox"))
-        //    {
-        //        Sword sword = other.GetComponent<PlayerStateMachine>().sword;
-        //        // take damage
-        //        enemy.Health -= sword.damage;
-        //        // take knockback
-        //        enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
-        //        // go to hit state
-        //        nextState = NextState.Hit;
-        //    }
-        //    // the player itself
-        //    else if (other.CompareTag("Player"))
-        //    {
-        //        nextState = NextState.Chase;
-        //    }
-        //} 
         GameObject other = collision.gameObject;
         // if our hitbox is hit
         if (selfComponent == "Hitbox")
@@ -97,11 +76,3 @@ public class EnemyIdleState : EnemyState
     {
 
     }
-
-    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    //{
-    //    enemy.Health -= damage;
-    //    enemy.VelocityVector += push;
-    //    nextState = NextState.Hit;
-    //}
-}

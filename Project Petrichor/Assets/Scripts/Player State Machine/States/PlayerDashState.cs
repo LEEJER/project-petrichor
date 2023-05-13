@@ -83,10 +83,7 @@ public class PlayerDashState : PlayerState
             startNext = NextState.Deflect;
         }
     }
-    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
-    //{
 
-    //}
 
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
@@ -100,7 +97,6 @@ public class PlayerDashState : PlayerState
                 // apply self knockback
                 // interrupt attacks
                 // goto hit state
-                Debug.Log("Player was hit by enemy in DashState");
             }
         }
     }

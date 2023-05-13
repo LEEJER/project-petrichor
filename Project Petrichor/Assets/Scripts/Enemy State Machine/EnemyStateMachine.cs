@@ -168,14 +168,6 @@ public class EnemyStateMachine : StateMachine
         _currentState.EnterState(this);
     }
 
-
-    //public bool TakeDamage(float damage, Vector2 push)
-    //{
-    //    bool hit = !_currentState.Equals(HitState);
-    //    _currentState.OnTakeDamage(this, damage, push);
-    //    return hit;
-    //}
-
     public void RemoveSelf()
     {
         Destroy(gameObject);
@@ -268,29 +260,11 @@ public class EnemyStateMachine : StateMachine
         return obstructionWeight;
     }
 
-    //public void OnDetectionBoxEnter(Collider2D collision)
-    //{
-    //    _currentState.OnDetectionBoxEnter(this, collision);
-    //}
-
-    //public void OnDetectionBoxStay(Collider2D collision)
-    //{
-    //    _currentState.OnDetectionBoxStay(this, collision);
-    //}
-
-    //public void OnDetectionBoxExit(Collider2D collision)
-    //{
-    //    _currentState.OnDetectionBoxExit(this, collision);
-    //}
-
     public override void OnHitboxEnter(Collider2D collision, bool isTrigger, string component)
     {
         if (isTrigger)
         {
             _currentState.OnHitboxEnter(this, collision, component);
-            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
-            //{
-            //}
         }
     }
     public override void OnHitboxStay(Collider2D collision, bool isTrigger, string component)
@@ -298,9 +272,6 @@ public class EnemyStateMachine : StateMachine
         if (isTrigger)
         {
             _currentState.OnHitboxStay(this, collision, component);
-            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
-            //{
-            //}
         }
     }
     public override void OnHitboxExit(Collider2D collision, bool isTrigger, string component)
@@ -308,9 +279,6 @@ public class EnemyStateMachine : StateMachine
         if (isTrigger)
         {
             _currentState.OnHitboxExit(this, collision, component);
-            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
-            //{
-            //}
         }
     }
 }

@@ -52,9 +52,4 @@ public class EnemyDieState : EnemyState
     {
 
     }
-
-    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    //{
-
-    //}
 }

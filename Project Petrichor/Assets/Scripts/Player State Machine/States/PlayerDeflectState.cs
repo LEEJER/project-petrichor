@@ -112,32 +112,6 @@ public class PlayerDeflectState : PlayerState
             }
         }
     }
-    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
-    //{
-    //    // we can interrupt once the deflect ends
-    //    // so, if we are still in the deflect animation
-    //    if (deflectFramesActive)
-    //    {
-    //        if (col.gameObject == null)
-    //        {
-    //            return;
-    //        }
-    //        if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("Enemy"))
-    //        {
-    //            Debug.Log("deflect");
-    //            EnemyStateMachine esm = col.gameObject.GetComponent<EnemyStateMachine>();
-    //            startDeflectHit = true;
-    //            // apply player velocity
-    //            player.VelocityVector = esm.VelocityVector.normalized * 2.2f;
-    //            esm.TakeDamage(0f, esm.VelocityVector.normalized * -1f * 3f);
-    //        }
-    //    }
-    //    // we are not in the deflect animation
-    //    else
-    //    {
-
-    //    }
-    //}
 
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
@@ -153,7 +127,7 @@ public class PlayerDeflectState : PlayerState
                 // goto hit state
                 if (!deflectBox.enabled)
                 {
-                    Debug.Log("Player was hit by enemy in DeflectState");
+                    
                 }
             }
         }
@@ -161,7 +135,8 @@ public class PlayerDeflectState : PlayerState
         {
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                Debug.Log("deflected");
+                player.VelocityVector = other.transform.parent.GetComponent<EnemyStateMachine>().VelocityVector.normalized * player.DeflectKnockback * player.SelfKnockback;
+                startDeflectHit = true;
             }
         }
     }

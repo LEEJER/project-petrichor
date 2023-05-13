@@ -60,10 +60,6 @@ public class PlayerRunState : PlayerState
             player.SwitchState(player.DeflectState);
         }
     }
-    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
-    //{
-
-    //}
 
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
@@ -77,7 +73,6 @@ public class PlayerRunState : PlayerState
                 // apply self knockback
                 // interrupt attacks
                 // goto hit state
-                Debug.Log("Player was hit by enemy in RunState");
             }
         }
     }
