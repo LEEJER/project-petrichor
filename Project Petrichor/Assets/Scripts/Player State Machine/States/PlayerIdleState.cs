@@ -7,7 +7,7 @@ public class PlayerIdleState : PlayerState
 {
     public override void EnterState(PlayerStateMachine player)
     {
-        
+        player.currentState = PlayerStateMachine.CurrentState.Idle;
     }
 
     public override void UpdateState(PlayerStateMachine player)
@@ -55,7 +55,31 @@ public class PlayerIdleState : PlayerState
             player.SwitchState(player.DeflectState);
         }
     }
-    public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //{
+
+    //}
+    public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+        GameObject other = collision.gameObject;
+        if (selfComponent == "Hitbox")
+        {
+            // if our hitbox was hit by enemy hurtbox
+            if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
+            {
+                // take damage
+                // apply self knockback
+                // interrupt attacks
+                // goto hit state
+                Debug.Log("Player was hit by enemy in IdleState");
+            }
+        }
+    }
+    public override void OnHitboxStay(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+
+    }
+    public override void OnHitboxExit(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
 
     }

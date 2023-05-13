@@ -3,8 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerStateMachine : MonoBehaviour
+public class PlayerStateMachine : StateMachine
 {
+    public enum CurrentState
+    {
+        Attack,
+        Dash,
+        Idle,
+        Run,
+        Deflect,
+        DeflectHit,
+        Hit
+    }
+
     // STATE MACHINE STUFF
     private PlayerState             _currentState;
     public  PlayerAttackState       AttackState     = new PlayerAttackState();
@@ -14,6 +25,8 @@ public class PlayerStateMachine : MonoBehaviour
     public  PlayerDeflectState      DeflectState    = new PlayerDeflectState();
     public  PlayerDeflectHitState   DeflectHitState = new PlayerDeflectHitState();
     public  PlayerHitState          HitState        = new PlayerHitState();
+
+    public CurrentState currentState;
     // STATE MACHINE STUFF END
 
     // Stuff for collision detection and movement
@@ -137,12 +150,32 @@ public class PlayerStateMachine : MonoBehaviour
     {
         RelativeMousePos = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>()) - transform.position;
     }
-    public void OnCollisionEnter2D(Collision2D collision)
+    //public void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    _currentState.OnCollisionEnter2D(this, collision);
+    //}
+    public override void OnHitboxEnter(Collider2D collision, bool isTrigger, string component)
     {
-        _currentState.OnCollisionEnter2D(this, collision);
+        if (isTrigger)
+        {
+            _currentState.OnHitboxEnter(this, collision, component);
+        }
     }
-    
-    
+    public override void OnHitboxStay(Collider2D collision, bool isTrigger, string component)
+    {
+        if (isTrigger)
+        {
+            _currentState.OnHitboxStay(this, collision, component);
+        }
+    }
+    public override void OnHitboxExit(Collider2D collision, bool isTrigger, string component)
+    {
+        if (isTrigger)
+        {
+            _currentState.OnHitboxExit(this, collision, component);
+        }
+    }
+
     public void SwitchState(PlayerState state)
     {
         _currentState.ExitState(this);

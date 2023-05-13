@@ -6,6 +6,7 @@ public class EnemyDieState : EnemyState
 {
     public override void EnterState(EnemyStateMachine enemy)
     {
+        enemy.currentState = EnemyStateMachine.CurrentState.Die;
         //enemy.animator.SetTrigger("t_die");
         EventEndDeathAnimation(enemy);
     }
@@ -25,22 +26,35 @@ public class EnemyDieState : EnemyState
         enemy.RemoveSelf();
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D col)
+    public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
+    {
+        GameObject other = collision.gameObject;
+        if (selfComponent == "Hitbox")
+        {
+            // if we are hit by the player hurtbox
+            if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
+            {
+                Sword sword = other.GetComponent<Sword>();
+                // dont take damage
+                // dont go to hit state
+                // get pushed
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+            }
+        }
+        
+    }
+
+    public override void OnHitboxStay(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
+    {
+
+    }
+    public override void OnHitboxExit(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
 
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D col)
-    {
+    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
+    //{
 
-    }
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D col)
-    {
-
-    }
-
-    public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    {
-
-    }
+    //}
 }

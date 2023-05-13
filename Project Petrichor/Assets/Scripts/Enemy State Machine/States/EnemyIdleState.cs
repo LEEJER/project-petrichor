@@ -7,6 +7,7 @@ public class EnemyIdleState : EnemyState
     public NextState nextState = NextState.Nothing;
     public override void EnterState(EnemyStateMachine enemy)
     {
+        enemy.currentState = EnemyStateMachine.CurrentState.Idle;
         nextState = NextState.Nothing;
     }
 
@@ -30,31 +31,77 @@ public class EnemyIdleState : EnemyState
         nextState = NextState.Nothing;
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        //GameObject other = collision.gameObject;
+        //// if we touch the player
+        //if (other.layer == LayerMask.NameToLayer("Player"))
+        //{
+        //    // specifically the hurtbox
+        //    if (other.CompareTag("Hurtbox"))
+        //    {
+        //        Sword sword = other.GetComponent<PlayerStateMachine>().sword;
+        //        // take damage
+        //        enemy.Health -= sword.damage;
+        //        // take knockback
+        //        enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+        //        // go to hit state
+        //        nextState = NextState.Hit;
+        //    }
+        //    // the player itself
+        //    else if (other.CompareTag("Player"))
+        //    {
+        //        nextState = NextState.Chase;
+        //    }
+        //} 
+        GameObject other = collision.gameObject;
+        // if our hitbox is hit
+        if (selfComponent == "Hitbox")
         {
-            nextState = NextState.Chase;
+            // if we are hit by the player hurtbox
+            if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
+            {
+                Sword sword = other.GetComponent<PlayerStateMachine>().sword;
+                // take damage
+                enemy.Health -= sword.damage;
+                // take knockback
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                // go to hit state
+                nextState = NextState.Hit;
+            }
+        }
+        else if (selfComponent == "DetectionBox")
+        {
+            if (other.CompareTag("Player"))
+            {
+                enemy.PathfindingTarget = collision.gameObject.GetComponent<Rigidbody2D>().position;
+                nextState = NextState.Chase;
+            }
         }
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxStay(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        GameObject other = collision.gameObject;
+        if (selfComponent == "DetectionBox")
         {
-            nextState = NextState.Chase;
+            if (other.CompareTag("Player"))
+            {
+                enemy.PathfindingTarget = collision.gameObject.GetComponent<Rigidbody2D>().position;
+                nextState = NextState.Chase;
+            }
         }
     }
 
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxExit(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
 
     }
 
-    public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    {
-        enemy.Health -= damage;
-        enemy.VelocityVector += push;
-        nextState = NextState.Hit;
-    }
+    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
+    //{
+    //    enemy.Health -= damage;
+    //    enemy.VelocityVector += push;
+    //    nextState = NextState.Hit;
+    //}
 }

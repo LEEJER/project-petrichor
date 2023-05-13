@@ -3,14 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 
-public class EnemyStateMachine : MonoBehaviour
+public class EnemyStateMachine : StateMachine
 {
+    public enum CurrentState
+    {
+        Idle,
+        Attack,
+        Chase,
+        Hit,
+        Die,
+        Patrol
+    }
+
     private EnemyState          _currentState;
     public  EnemyIdleState      IdleState       = new EnemyIdleState();
     public  EnemyAttackState    AttackState     = new EnemyAttackState();
     public  EnemyChaseState     ChaseState      = new EnemyChaseState();
     public  EnemyHitState       HitState        = new EnemyHitState();
     public  EnemyDieState       DieState        = new EnemyDieState();
+    public  EnemyPatrolState    PatrolState     = new EnemyPatrolState();
+
+    public CurrentState currentState;
 
     // Stuff for collision detection and movement
     private float               _collisionOffset    = 0.0001f;
@@ -21,10 +34,16 @@ public class EnemyStateMachine : MonoBehaviour
     //private float _maxVelocity        = 10f;
     private float   _movementSpeed      = 1f;
     private float   _velocityDecayRate  = 8f;
-    private float   _chaseSpeed         = 1.1f;
+
+    private float   _chaseSpeed         = 0.25f;
+    private float   _attackDistance     = 0.25f;
 
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;
+    //private Vector2 _desireVector       = Vector2.zero;
+    public Vector2[]    DesireVectors   = new Vector2[12];
+    public float[]      DesireWeights   = new float[12];
+    public float[]      AwayWeights     = new float[12];
 
     // Game object components
     private Animator    _animator;
@@ -45,9 +64,11 @@ public class EnemyStateMachine : MonoBehaviour
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
+    //public Vector2  DesireVector        { get { return _desireVector; }     set { _desireVector = value; } }
     public Animator animator            { get { return _animator; } private set { _animator = value; } }
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
     public float    ChaseSpeed          { get { return _chaseSpeed; }       set { _chaseSpeed = value; } }
+    public float    AttackDistance      { get { return _attackDistance; }   set { _attackDistance = value; } }
     public float    Health
     {
         get { return _health; }
@@ -80,6 +101,14 @@ public class EnemyStateMachine : MonoBehaviour
         _health = _maxHealth;
 
         _seeker = GetComponent<Seeker>();
+
+        for (int i = 0; i < DesireVectors.Length; i++)
+        {
+            DesireWeights[i]    = 0;
+            AwayWeights[i]      = 0;
+            DesireVectors[i]    = new Vector2(Mathf.Cos(2 * i * Mathf.PI / DesireVectors.Length), Mathf.Sin(2 * i * Mathf.PI / DesireVectors.Length)).normalized;
+            //Debug.Log(i + ": " + DesireVectors[i]);
+        }
 
         _currentState = IdleState;
         _currentState.EnterState(this);
@@ -140,12 +169,12 @@ public class EnemyStateMachine : MonoBehaviour
     }
 
 
-    public bool TakeDamage(float damage, Vector2 push)
-    {
-        bool hit = !_currentState.Equals(HitState);
-        _currentState.OnTakeDamage(this, damage, push);
-        return hit;
-    }
+    //public bool TakeDamage(float damage, Vector2 push)
+    //{
+    //    bool hit = !_currentState.Equals(HitState);
+    //    _currentState.OnTakeDamage(this, damage, push);
+    //    return hit;
+    //}
 
     public void RemoveSelf()
     {
@@ -169,18 +198,119 @@ public class EnemyStateMachine : MonoBehaviour
         }
     }
 
-    public void OnDetectionBoxEnter(Collider2D collision)
+    public Vector2 GetChaseVector(Vector2 target, float speed)
     {
-        _currentState.OnDetectionBoxEnter(this, collision);
+        Vector2 targetDirection = UpdateDesireVector(target).normalized;
+        //Debug.Log(
+        //    AwayWeights[0] + ", " + AwayWeights[1] + ", " +
+        //    AwayWeights[2] + ", " + AwayWeights[3] + ", " +
+        //    AwayWeights[4] + ", " + AwayWeights[5] + ", " +
+        //    AwayWeights[6] + ", " + AwayWeights[7] + ", " +
+        //    AwayWeights[8] + ", " + AwayWeights[9] + ", " +
+        //    AwayWeights[10] + ", " + AwayWeights[11]
+        //    );
+        //Vector2 targetDirection = (target - _enemyRigidbody.position).normalized;
+        //float targetDistance = Vector2.Distance(target, _enemyRigidbody.position);
+        //float desire = Mathf.Min(1f, Mathf.Max(targetDistance - _attackDistance, 0f));
+        return targetDirection * speed;
     }
 
-    public void OnDetectionBoxStay(Collider2D collision)
+    public Vector2 UpdateDesireVector(Vector2 target)
     {
-        _currentState.OnDetectionBoxStay(this, collision);
+        Vector2 targetDirection = (target - _enemyRigidbody.position).normalized;
+        float targetDistance = Vector2.Distance(target, _enemyRigidbody.position);
+
+        //float desire = Mathf.Min(1f, Mathf.Max(targetDistance - _attackDistance, 0f));
+        //return desire;
+
+
+        for (int i = 0; i < DesireVectors.Length; i++)
+        {
+            AwayWeights[i] = GetObstructionWeight(DesireVectors[i], 0.25f);
+            DesireWeights[i] = Mathf.Max(Vector2.Dot(DesireVectors[i], targetDirection), 0);// * Mathf.Max(targetDistance-_attackDistance, 0.1f);
+        }
+        int dir = 0;
+        float maxWeight = 0f;
+        for (int i = 0; i < DesireVectors.Length; i++)
+        {
+            //float weight = DesireWeights[i] + 4 * AwayWeights[(i + 6) % 12]; 
+            float weight = DesireWeights[i] - 3 * AwayWeights[i];
+            if (weight > maxWeight)
+            {
+                maxWeight = weight;
+                dir = i;
+            }
+        }
+
+        return DesireVectors[dir];
     }
 
-    public void OnDetectionBoxExit(Collider2D collision)
+    private float GetObstructionWeight(Vector2 direction, float distance)
     {
-        _currentState.OnDetectionBoxExit(this, collision);
+        float obstructionWeight = 0f;
+        ContactFilter2D contactFilter = new ContactFilter2D();
+        contactFilter.SetLayerMask(LayerMask.GetMask("Environment") | LayerMask.GetMask("Enemy"));
+
+        RaycastHit2D[] results = new RaycastHit2D[1];
+        int count = _enemyCollider.Cast(
+            direction,      
+            contactFilter,  
+            results,        
+            distance,       
+            true
+        );
+
+        //int count = Physics2D.Raycast(_enemyRigidbody.position, direction, contactFilter, results, distance);
+        if (count > 0)
+        {
+            obstructionWeight = 1 - (results[0].distance / distance);
+        }
+        return obstructionWeight;
+    }
+
+    //public void OnDetectionBoxEnter(Collider2D collision)
+    //{
+    //    _currentState.OnDetectionBoxEnter(this, collision);
+    //}
+
+    //public void OnDetectionBoxStay(Collider2D collision)
+    //{
+    //    _currentState.OnDetectionBoxStay(this, collision);
+    //}
+
+    //public void OnDetectionBoxExit(Collider2D collision)
+    //{
+    //    _currentState.OnDetectionBoxExit(this, collision);
+    //}
+
+    public override void OnHitboxEnter(Collider2D collision, bool isTrigger, string component)
+    {
+        if (isTrigger)
+        {
+            _currentState.OnHitboxEnter(this, collision, component);
+            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
+            //{
+            //}
+        }
+    }
+    public override void OnHitboxStay(Collider2D collision, bool isTrigger, string component)
+    {
+        if (isTrigger)
+        {
+            _currentState.OnHitboxStay(this, collision, component);
+            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
+            //{
+            //}
+        }
+    }
+    public override void OnHitboxExit(Collider2D collision, bool isTrigger, string component)
+    {
+        if (isTrigger)
+        {
+            _currentState.OnHitboxExit(this, collision, component);
+            //if (component == "DetectionBox" || component == "Hurtbox" || component == "Hitbox")
+            //{
+            //}
+        }
     }
 }

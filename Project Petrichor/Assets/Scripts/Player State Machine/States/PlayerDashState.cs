@@ -11,6 +11,7 @@ public class PlayerDashState : PlayerState
     private NextState startNext = NextState.Nothing;
     public override void EnterState(PlayerStateMachine player)
     {
+        player.currentState = PlayerStateMachine.CurrentState.Dash;
         startDash = true;
         canInterrupt = true;
         canStartDash = true;
@@ -82,10 +83,36 @@ public class PlayerDashState : PlayerState
             startNext = NextState.Deflect;
         }
     }
-    public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //{
+
+    //}
+
+    public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+        GameObject other = collision.gameObject;
+        if (selfComponent == "Hitbox")
+        {
+            // if our hitbox was hit by enemy hurtbox
+            if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
+            {
+                // take damage
+                // apply self knockback
+                // interrupt attacks
+                // goto hit state
+                Debug.Log("Player was hit by enemy in DashState");
+            }
+        }
+    }
+    public override void OnHitboxStay(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
 
     }
+    public override void OnHitboxExit(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+
+    }
+
 
     private void Animate(PlayerStateMachine player)
     {

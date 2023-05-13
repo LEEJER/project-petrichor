@@ -7,6 +7,7 @@ public class PlayerHitState : PlayerState
 {
     public override void EnterState(PlayerStateMachine player)
     {
+        player.currentState = PlayerStateMachine.CurrentState.Hit;
         Animate(player);
     }
 
@@ -36,7 +37,19 @@ public class PlayerHitState : PlayerState
     {
 
     }
-    public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //{
+
+    //}
+    public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+
+    }
+    public override void OnHitboxStay(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+
+    }
+    public override void OnHitboxExit(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
 
     }

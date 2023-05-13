@@ -43,12 +43,13 @@ public class Sword : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, 0);
         dir = direction;
         swordHitBox.enabled = true;
+        float sign_x = Mathf.Sign(dir.x);
+        float sign_y = Mathf.Sign(dir.y);
+
         // in the horizontal direction
 
         if (Mathf.Abs(dir.x) * 2 > Mathf.Abs(dir.y))
         {
-            float sign_x = Mathf.Sign(dir.x);
-            float sign_y = Mathf.Sign(dir.y);
             // you really dont want to see the monster that this following line used to be before I figured out how to simplifiy it
             transform.Rotate(Vector3.forward, sign_x * sign_y * Vector2.Angle(Vector2.right * sign_x, dir) * 0.4f);
             swordHitBox.offset = new Vector2(Mathf.Sign(dir.x) * hitboxOffset, 0);
@@ -56,8 +57,6 @@ public class Sword : MonoBehaviour
         // in the vertical direction
         else
         {
-            float sign_x = Mathf.Sign(dir.x);
-            float sign_y = Mathf.Sign(dir.y);
             // you really dont want to see the monster that this following line used to be before I figured out how to simplifiy it
             transform.Rotate(Vector3.forward, sign_x * sign_y * Vector2.Angle(Vector2.up * sign_y, dir) * -0.8f);
             swordHitBox.offset = new Vector2(0, Mathf.Sign(dir.y) * hitboxOffset);
@@ -69,20 +68,28 @@ public class Sword : MonoBehaviour
         animator.SetTrigger("attack");
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            GameObject enemy = other.gameObject;
-            if (enemy != null)
-            {
-                EnemyStateMachine enemyScript = enemy.GetComponent<EnemyStateMachine>();
-                bool hit = enemyScript.TakeDamage(damage, dir.normalized * knockbackForce);
-                if (hit)
-                {
-                    playerScript.VelocityVector += -1f * dir.normalized * (knockbackForce/1.5f);
-                }
-            }
-        } 
-    }
+    //private void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    GameObject _other = other.gameObject;
+    //    if (_other != null)
+    //    {
+    //        if (other.CompareTag("Hitbox"))
+    //        {
+    //            EnemyStateMachine enemyScript = _other.GetComponent<EnemyStateMachine>();
+    //        }
+    //    }
+    //    if (other.CompareTag("Enemy"))
+    //    {
+    //        GameObject enemy = other.gameObject;
+    //        if (enemy != null)
+    //        {
+    //            EnemyStateMachine enemyScript = enemy.GetComponent<EnemyStateMachine>();
+    //            bool hit = enemyScript.TakeDamage(damage, dir.normalized * knockbackForce);
+    //            if (hit)
+    //            {
+    //                playerScript.VelocityVector += -1f * dir.normalized * (knockbackForce/1.5f);
+    //            }
+    //        }
+    //    } 
+    //}
 }

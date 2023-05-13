@@ -10,6 +10,7 @@ public class EnemyHitState : EnemyState
 
     public override void EnterState(EnemyStateMachine enemy)
     {
+        enemy.currentState = EnemyStateMachine.CurrentState.Hit;
         nextState = NextState.Nothing;
         if (enemy.Health <= 0)
         {
@@ -47,29 +48,54 @@ public class EnemyHitState : EnemyState
         time = 0f;
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        GameObject other = collision.gameObject;
+        // if we were hit
+        if (selfComponent == "Hitbox")
         {
-            nextState = NextState.Chase;
+            // by the player hurtbox
+            if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
+            {
+                Sword sword = other.GetComponent<Sword>();
+                // take damage
+                enemy.Health -= sword.damage;
+                // take knockback
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                // go to hit state
+                nextState = NextState.Hit;
+            }
+        }
+        // if we detected a player
+        else if (selfComponent == "DetectionBox")
+        {
+            // make sure it was a player
+            if (other.layer == LayerMask.NameToLayer("Player") && collision.gameObject.CompareTag("Player"))
+            {
+                nextState = NextState.Chase;
+            }
         }
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxStay(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (selfComponent == "DetectionBox")
         {
-            nextState = NextState.Chase;
+            // make sure it was a player
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Player") && collision.gameObject.CompareTag("Player"))
+            {
+                nextState = NextState.Chase;
+            }
         }
     }
 
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxExit(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
 
     }
 
-    public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    {
+    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
+    //{
 
-    }
+    //}
 }

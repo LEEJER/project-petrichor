@@ -13,6 +13,7 @@ public class PlayerDeflectHitState : PlayerState
 
     public override void EnterState(PlayerStateMachine player)
     {
+        player.currentState = PlayerStateMachine.CurrentState.DeflectHit;
         canInterrupt    = true;
         canBufferInput  = true;
         startDeflectHit = true; 
@@ -92,23 +93,48 @@ public class PlayerDeflectHitState : PlayerState
             if (canBufferInput) { startNext = NextState.Deflect; }
         }
     }
-    public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //public override void OnCollisionEnter2D(PlayerStateMachine player, Collision2D col)
+    //{
+    //    // we can interrupt once the deflect ends
+    //    // so, if we are still in the deflect animation
+    //    if (!canInterrupt)
+    //    {
+    //        if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("EnemyProjectile"))
+    //        {
+    //            startDeflectHit = true;
+    //            // apply player velocity
+    //        }
+    //    }
+    //    // we are not in the deflect animation
+    //    else
+    //    {
+
+    //    }
+    //}
+
+    public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
-        // we can interrupt once the deflect ends
-        // so, if we are still in the deflect animation
-        if (!canInterrupt)
+        GameObject other = collision.gameObject;
+        if (selfComponent == "Hitbox")
         {
-            if (col.gameObject.CompareTag("Enemy") || col.gameObject.CompareTag("EnemyProjectile"))
+            // if our hitbox was hit by enemy hurtbox
+            if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                startDeflectHit = true;
-                // apply player velocity
+                // take damage
+                // apply self knockback
+                // interrupt attacks
+                // goto hit state
+                Debug.Log("Player was hit by enemy in DeflectHitState");
             }
         }
-        // we are not in the deflect animation
-        else
-        {
+    }
+    public override void OnHitboxStay(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
 
-        }
+    }
+    public override void OnHitboxExit(PlayerStateMachine player, Collider2D collision, string selfComponent)
+    {
+
     }
 
     private void Animate(PlayerStateMachine player)

@@ -7,6 +7,7 @@ public class EnemyPatrolState : EnemyState
     NextState nextState = NextState.Nothing;
     public override void EnterState(EnemyStateMachine enemy)
     {
+        enemy.currentState = EnemyStateMachine.CurrentState.Patrol;
         nextState = NextState.Nothing;
     }
 
@@ -33,7 +34,7 @@ public class EnemyPatrolState : EnemyState
         nextState = NextState.Nothing;
     }
 
-    public override void OnDetectionBoxEnter(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
@@ -41,22 +42,22 @@ public class EnemyPatrolState : EnemyState
         }
     }
 
-    public override void OnDetectionBoxStay(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxStay(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             nextState = NextState.Chase;
         }
     }
-    public override void OnDetectionBoxExit(EnemyStateMachine enemy, Collider2D collision)
+    public override void OnHitboxExit(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
 
     }
 
-    public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
-    {
-        enemy.Health -= damage;
-        enemy.VelocityVector += push;
-        nextState = NextState.Hit;
-    }
+    //public override void OnTakeDamage(EnemyStateMachine enemy, float damage, Vector2 push)
+    //{
+    //    enemy.Health -= damage;
+    //    enemy.VelocityVector += push;
+    //    nextState = NextState.Hit;
+    //}
 }
