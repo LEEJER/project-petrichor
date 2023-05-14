@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -27,39 +28,16 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Started");
         if (OnEnemyDie == null)
         {
             OnEnemyDie = new UnityEvent();
         }
-        
-
-        UIManager = GameObject.Find("UIManager");
-        if (UIManager != null)
-        {
-            _canvas = UIManager.transform.Find("Canvas");
-            _healthBarObject = _canvas.transform.Find("HealthBar");
-            if (_healthBarObject != null)
-            {
-                _healthBar = _healthBarObject.transform.Find("Bar");
-            }
-        }
-
-        GameObject playerManager = GameObject.Find("PlayerManager");
-        if (playerManager != null)
-        {
-            PlayerManager = playerManager.GetComponent<PlayerManager>();
-        }
-        GameObject enemyManager = GameObject.Find("EnemyManager");
-        if (enemyManager != null)
-        {
-            EnemyManager = enemyManager.GetComponent<EnemyManager>();
-        }
-
-        
     }
 
     private void Awake()
     {
+        Debug.Log("awake");
         // singleton
         if (instance != null)
         {
@@ -76,7 +54,7 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        
+        Debug.Log("enable");
     }
 
     public void SavePlayerScore()
@@ -106,6 +84,52 @@ public class GameManager : MonoBehaviour
         if (_healthBar != null)
         {
             _healthBar.GetComponent<Image>().rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200f * val);
+        }
+    }
+
+    public void PlayGame()
+    {
+        SceneManager.LoadScene("Level1");
+    }
+
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void GameOver()
+    {
+        SceneManager.LoadScene("GameOver");
+    }
+
+    public void FindUIManager()
+    {
+        UIManager = GameObject.Find("UIManager");
+        if (UIManager != null)
+        {
+            _canvas = UIManager.transform.Find("Canvas");
+            _healthBarObject = _canvas.transform.Find("HealthBar");
+            if (_healthBarObject != null)
+            {
+                _healthBar = _healthBarObject.transform.Find("Bar");
+            }
+        }
+    }
+
+    public void FindPlayerManager()
+    {
+        GameObject playerManager = GameObject.Find("PlayerManager");
+        if (playerManager != null)
+        {
+            PlayerManager = playerManager.GetComponent<PlayerManager>();
+        }
+    }
+    public void FindEnemyManager()
+    {
+        GameObject enemyManager = GameObject.Find("EnemyManager");
+        if (enemyManager != null)
+        {
+            EnemyManager = enemyManager.GetComponent<EnemyManager>();
         }
     }
 }

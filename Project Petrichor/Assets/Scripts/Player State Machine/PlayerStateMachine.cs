@@ -113,9 +113,12 @@ public class PlayerStateMachine : StateMachine
 
     private void FixedUpdate()
     {
+        // update health bar
         _health += _barRate * Time.deltaTime;
         if (_health > _maxHealth) { _health = _maxHealth; }
         GameManager.instance.SetBarPercentage(_health / _maxHealth);
+
+        // move
         MovePlayerBasedOnVelocity();
         _currentState.UpdateState(this);
     }

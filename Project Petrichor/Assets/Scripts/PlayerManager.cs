@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -13,6 +12,14 @@ public class PlayerManager : MonoBehaviour
     private void Start()
     {
         GameManager.instance.OnEnemyDie.AddListener(EnemyKillCounterIncrement);
+        GameManager.instance.FindEnemyManager();
+        GameManager.instance.FindPlayerManager();
+        GameManager.instance.FindUIManager();
+
+        GameObject player = Instantiate(playerPrefab, this.transform, true);
+        player.transform.position = Vector2.zero;
+        LevelManager levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        levelManager.SetCameraFollow(player);
     }
 
     // Update is called once per frame
@@ -22,12 +29,12 @@ public class PlayerManager : MonoBehaviour
         if (transform.childCount <= 0)
         {
             AllPlayersDead();
+            GameManager.instance.SavePlayerScore();
         }
     }
 
     private void OnDisable()
     {
-        GameManager.instance.SavePlayerScore();
         GameManager.instance.OnEnemyDie.RemoveListener(EnemyKillCounterIncrement);
     }
 
@@ -38,6 +45,6 @@ public class PlayerManager : MonoBehaviour
 
     public void AllPlayersDead()
     {
-        SceneManager.LoadScene("GameOver");
+        GameManager.instance.GameOver();
     }
 }

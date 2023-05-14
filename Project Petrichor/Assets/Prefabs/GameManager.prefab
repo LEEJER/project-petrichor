@@ -48,6 +48,8 @@ MonoBehaviour:
   PlayerManager: {fileID: 0}
   EnemyManager: {fileID: 0}
   Environment: {fileID: 0}
+  _playerTime: 0
+  _playerKills: 0
   OnEnemyDie:
     m_PersistentCalls:
       m_Calls: []
