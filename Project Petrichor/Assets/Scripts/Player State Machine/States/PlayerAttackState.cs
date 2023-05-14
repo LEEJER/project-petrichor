@@ -10,7 +10,7 @@ public class PlayerAttackState : PlayerState
     private bool        startAttack     = false;
     private int         attackNum       = 0;
     private Vector2     dir             = Vector2.zero;
-    private NextState   startNext       = NextState.Nothing;
+    private NextState   nextState       = NextState.Nothing;
     
 
     public override void EnterState(PlayerStateMachine player)
@@ -20,7 +20,7 @@ public class PlayerAttackState : PlayerState
         attackNum       = 0;
         startAttack     = true;
         canInterrupt    = true;
-        startNext       = NextState.Nothing;
+        nextState       = NextState.Nothing;
         canBufferInput  = true;
     }
 
@@ -35,7 +35,7 @@ public class PlayerAttackState : PlayerState
             Animate(player);
             player.sword.SwordAttack(dir, attackNum);
 
-            startNext       = NextState.Nothing;
+            nextState       = NextState.Nothing;
             canInterrupt    = false;
             startAttack     = false;
             canBufferInput  = false;
@@ -45,18 +45,23 @@ public class PlayerAttackState : PlayerState
         }
         else if (canInterrupt)
         {
-            switch (startNext)
+            if (player.Health >= player.MaxHealth)
+            {
+                nextState = NextState.Die;
+            }
+            switch (nextState)
             {
                 case NextState.Deflect:
-                    player.animator.SetTrigger("t_deflect");
                     Interrupt(player, player.DeflectState);
                     break;
                 case NextState.Dash:
-                    player.animator.SetTrigger("t_dash");
                     Interrupt(player, player.DashState);
                     break;
+                case NextState.Die:
+                    //Interrupt(player, player.DieState);
+                    break;
                 default:
-                    if (!startAttack && player.InputVector != Vector2.zero)
+                    if (player.InputVector != Vector2.zero)
                     {
                         player.FacingVector = player.InputVector;
                         Interrupt(player, player.IdleState);
@@ -86,7 +91,7 @@ public class PlayerAttackState : PlayerState
     {
         startAttack     = false;
         canInterrupt    = true;
-        startNext       = NextState.Nothing;
+        nextState       = NextState.Nothing;
         canBufferInput  = false;
     }
 
@@ -111,14 +116,14 @@ public class PlayerAttackState : PlayerState
     {
         if (context.started)
         {
-            if (canBufferInput) { startNext = NextState.Dash; }
+            if (canBufferInput) { nextState = NextState.Dash; }
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            if (canBufferInput) { startNext = NextState.Deflect; }
+            if (canBufferInput) { nextState = NextState.Deflect; }
         }
     }
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)

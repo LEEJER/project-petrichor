@@ -9,7 +9,7 @@ public class PlayerDeflectHitState : PlayerState
     private bool        canInterrupt    = false;
     private bool        startDeflectHit = false;
     private Vector2     dir             = Vector2.zero;
-    private NextState   startNext       = NextState.Nothing;
+    private NextState   nextState       = NextState.Nothing;
 
     public override void EnterState(PlayerStateMachine player)
     {
@@ -17,7 +17,7 @@ public class PlayerDeflectHitState : PlayerState
         canInterrupt    = true;
         canBufferInput  = true;
         startDeflectHit = true; 
-        startNext       = NextState.Nothing;
+        nextState       = NextState.Nothing;
         dir             = player.VelocityVector * -1f;
         Animate(player);
     }
@@ -31,35 +31,61 @@ public class PlayerDeflectHitState : PlayerState
 
             Animate(player);
 
-            startNext = NextState.Nothing;
+            nextState = NextState.Nothing;
         }
-        else if (startNext == NextState.Attack && canInterrupt)
+        else if (canInterrupt)
         {
-            player.animator.SetTrigger("t_attack");
-            Interrupt(player, player.AttackState);
+            switch (nextState)
+            {
+                case NextState.Attack:
+                    Interrupt(player, player.AttackState);
+                    break;
+                case NextState.Deflect:
+                    Interrupt(player, player.DeflectState);
+                    break;
+                case NextState.Dash:
+                    Interrupt(player, player.DashState);
+                    break;
+                case NextState.Hit:
+                    Interrupt(player, player.HitState);
+                    break;
+                default:
+                    if (player.InputVector != Vector2.zero)
+                    {
+                        player.FacingVector = player.InputVector;
+                        Interrupt(player, player.IdleState);
+                    }
+                    break;
+            }
         }
-        else if (startNext == NextState.Deflect && canInterrupt)
-        {
-            player.animator.SetTrigger("t_deflect");
-            Interrupt(player, player.DeflectState);
-        }
-        else if (startNext == NextState.Dash && canInterrupt)
-        {
-            player.animator.SetTrigger("t_dash");
-            Interrupt(player, player.DashState);
-        }
-        else if (player.InputVector != Vector2.zero && canInterrupt)
-        {
-            player.FacingVector = player.InputVector;
-            Interrupt(player, player.IdleState);
-        }
+
+        //else if (nextState == NextState.Attack && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_attack");
+        //    Interrupt(player, player.AttackState);
+        //}
+        //else if (nextState == NextState.Deflect && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_deflect");
+        //    Interrupt(player, player.DeflectState);
+        //}
+        //else if (nextState == NextState.Dash && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_dash");
+        //    Interrupt(player, player.DashState);
+        //}
+        //else if (player.InputVector != Vector2.zero && canInterrupt)
+        //{
+        //    player.FacingVector = player.InputVector;
+        //    Interrupt(player, player.IdleState);
+        //}
     }
 
     public override void ExitState(PlayerStateMachine player)
     {
         canInterrupt = true;
         canBufferInput = false;
-        startNext = NextState.Nothing;
+        nextState = NextState.Nothing;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -76,21 +102,21 @@ public class PlayerDeflectHitState : PlayerState
     {
         if (context.started)
         {
-            if (canBufferInput) { startNext = NextState.Attack; }
+            if (canBufferInput) { nextState = NextState.Attack; }
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            if (canBufferInput) { startNext = NextState.Dash; }
+            if (canBufferInput) { nextState = NextState.Dash; }
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            if (canBufferInput) { startNext = NextState.Deflect; }
+            if (canBufferInput) { nextState = NextState.Deflect; }
         }
     }
 
@@ -102,10 +128,15 @@ public class PlayerDeflectHitState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
                 // take damage
+                player.Health += enemy.Damage;
                 // apply self knockback
+                player.VelocityVector += enemy.VelocityVector.normalized * enemy.Knockback * player.SelfKnockback;
                 // interrupt attacks
+                canInterrupt = true;
                 // goto hit state
+                nextState = NextState.Hit;
             }
         }
     }

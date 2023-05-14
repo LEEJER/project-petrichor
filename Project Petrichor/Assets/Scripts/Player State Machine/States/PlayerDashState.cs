@@ -8,14 +8,14 @@ public class PlayerDashState : PlayerState
     private bool canInterrupt = false;
     private bool canStartDash = false;
     private bool startDash = false;
-    private NextState startNext = NextState.Nothing;
+    private NextState nextState = NextState.Nothing;
     public override void EnterState(PlayerStateMachine player)
     {
         player.currentState = PlayerStateMachine.CurrentState.Dash;
         startDash = true;
         canInterrupt = true;
         canStartDash = true;
-        startNext = NextState.Nothing;
+        nextState = NextState.Nothing;
     }
 
     public override void UpdateState(PlayerStateMachine player)
@@ -24,7 +24,7 @@ public class PlayerDashState : PlayerState
         {
             canInterrupt    = false;
             startDash       = false;
-            startNext = NextState.Nothing;
+            nextState = NextState.Nothing;
             canStartDash    = false;
 
             if (player.InputVector != Vector2.zero) { player.FacingVector = player.InputVector; }
@@ -32,23 +32,53 @@ public class PlayerDashState : PlayerState
 
             Animate(player);
         }
-        else if (startNext == NextState.Attack && canInterrupt)
+        else if (canInterrupt)
         {
-            player.animator.SetTrigger("t_interrupt");
-            player.SwitchState(player.AttackState);
+            if (player.Health >= player.MaxHealth)
+            {
+                nextState = NextState.Die;
+            }
+            switch (nextState)
+            {
+                case NextState.Deflect:
+                    Interrupt(player, player.DeflectState);
+                    break;
+                case NextState.Attack:
+                    Interrupt(player, player.AttackState);
+                    break;
+                case NextState.Hit:
+                    Interrupt(player, player.HitState);
+                    break;
+                case NextState.Die:
+                    //Interrupt(player, player.DieState);
+                    break;
+                default:
+                    if (player.InputVector != Vector2.zero)
+                    {
+                        player.FacingVector = player.InputVector;
+                        Interrupt(player, player.IdleState);
+                    }
+                    break;
+            }
         }
-        else if (startNext == NextState.Deflect && canInterrupt)
-        {
-            player.animator.SetTrigger("t_interrupt");
-            player.SwitchState(player.DeflectState);
-        }
-        // if there is movement input, try to interrupt
-        else if (canStartDash && player.InputVector != Vector2.zero)
-        {
-            player.FacingVector = player.InputVector;
-            player.animator.SetTrigger("t_interrupt");
-            player.SwitchState(player.IdleState);
-        }
+
+        //else if (nextState == NextState.Attack && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_interrupt");
+        //    player.SwitchState(player.AttackState);
+        //}
+        //else if (nextState == NextState.Deflect && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_interrupt");
+        //    player.SwitchState(player.DeflectState);
+        //}
+        //// if there is movement input, try to interrupt
+        //else if (canStartDash && player.InputVector != Vector2.zero)
+        //{
+        //    player.FacingVector = player.InputVector;
+        //    player.animator.SetTrigger("t_interrupt");
+        //    player.SwitchState(player.IdleState);
+        //}
     }
 
     public override void ExitState(PlayerStateMachine player)
@@ -56,6 +86,12 @@ public class PlayerDashState : PlayerState
         canInterrupt    = false;
         startDash       = false;
         canStartDash    = false;
+    }
+
+    private void Interrupt(PlayerStateMachine player, PlayerState state)
+    {
+        player.animator.SetTrigger("t_interrupt");
+        player.SwitchState(state);
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -66,7 +102,7 @@ public class PlayerDashState : PlayerState
     {
         if (context.started)
         {
-            startNext = NextState.Attack;
+            nextState = NextState.Attack;
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -80,7 +116,7 @@ public class PlayerDashState : PlayerState
     {
         if (context.started)
         {
-            startNext = NextState.Deflect;
+            nextState = NextState.Deflect;
         }
     }
 

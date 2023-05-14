@@ -5,26 +5,53 @@ using UnityEngine.InputSystem;
 
 public class PlayerRunState : PlayerState
 {
+    NextState nextState = NextState.Nothing;
     public override void EnterState(PlayerStateMachine player)
     {
         player.currentState = PlayerStateMachine.CurrentState.Run;
+        nextState = NextState.Nothing;
     }
 
     public override void UpdateState(PlayerStateMachine player)
     {
-        if (player.InputVector != Vector2.zero)
+        if (player.Health >= player.MaxHealth)
         {
-            player.VelocityVector = player.InputVector * player.MovementSpeed;
-            Animate(player);
+            nextState = NextState.Die;
         }
-        else
+        switch (nextState)
         {
-            player.SwitchState(player.IdleState);
+            case NextState.Deflect:
+                player.SwitchState(player.DeflectState);
+                break;
+            case NextState.Attack:
+                player.SwitchState(player.AttackState);
+                break;
+            case NextState.Dash:
+                player.SwitchState(player.DashState);
+                break;
+            case NextState.Hit:
+                player.SwitchState(player.HitState);
+                break;
+            case NextState.Die:
+                //player.SwitchState(player.DieState);
+                break;
+            default:
+                if (player.InputVector != Vector2.zero)
+                {
+                    player.VelocityVector = player.InputVector * player.MovementSpeed;
+                    Animate(player);
+                }
+                else
+                {
+                    player.SwitchState(player.IdleState);
+                }
+                break;
         }
     }
 
     public override void ExitState(PlayerStateMachine player)
     {
+        nextState = NextState.Nothing;
         player.animator.SetFloat("velocity_magnitude", 0f);
     }
 
@@ -40,24 +67,21 @@ public class PlayerRunState : PlayerState
     {
         if (context.started)
         {
-            player.SwitchState(player.AttackState);
+            nextState = NextState.Attack;
         }
-        else if (context.performed) { }
-        else if (context.canceled) { }
-        
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            player.SwitchState(player.DashState);
+            nextState = NextState.Dash;
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            player.SwitchState(player.DeflectState);
+            nextState = NextState.Deflect;
         }
     }
 

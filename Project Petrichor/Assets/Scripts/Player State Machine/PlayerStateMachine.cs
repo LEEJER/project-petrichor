@@ -54,6 +54,10 @@ public class PlayerStateMachine : StateMachine
     private Rigidbody2D _playerRigidBody;
     private Collider2D  _playerCollider;
 
+    private float _health = 0f;
+    private float _maxHealth = 100f;
+
+
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  RelativeMousePos    { get { return _relativeMousePos; } set { _relativeMousePos = value; } }
     public Vector2  InputVector         { get { return _inputVector; }      set { _inputVector = value; } }
@@ -64,16 +68,14 @@ public class PlayerStateMachine : StateMachine
     public float    DashSpeed           { get { return _dashSpeed; }        set { _dashSpeed = value; } }
     public float    SelfKnockback       { get { return _selfKnockback; }    set { _selfKnockback = value; } }
     public float    DeflectKnockback    { get { return _deflectKnockback; } set { _deflectKnockback = value; } }
+    public float    Health              { get { return _health; }           set { _health = value; } }
+    public float    MaxHealth           { get { return _maxHealth; }        set { _maxHealth = value; } }
     //public float    MaxVelocity         { get { return _maxVelocity; }      set { _maxVelocity = value; } }
 
 
     // Start is called before the first frame update
     void Start()
     {
-        // Initial state is IDLE
-        _currentState = IdleState;
-        _currentState.EnterState(this);
-
         // setup other
         _animator           = transform.Find("Sprite").GetComponent<Animator>();
         _playerRigidBody    = GetComponent<Rigidbody2D>();
@@ -83,6 +85,12 @@ public class PlayerStateMachine : StateMachine
         _movementFilter = new ContactFilter2D();
         _movementFilter.SetLayerMask(LayerMask.GetMask("Environment"));
         _movementFilter.useLayerMask = true;
+
+        _health = 0f;
+
+        // Initial state is IDLE
+        _currentState = IdleState;
+        _currentState.EnterState(this);
     }
 
     private void FixedUpdate()
@@ -204,5 +212,6 @@ public class PlayerStateMachine : StateMachine
     public void Event_DeflectHitState_AllowInterrupt()  { DeflectHitState.EventAllowInterrupt();    }
     public void Event_DeflectHitState_AllowBuffer()     { DeflectHitState.EventAllowBuffer();       }
     public void Event_DeflectHitState_EndDeflectHit()   { DeflectHitState.EventEndDeflectHit(this); }
-    public void Event_HitState_AllowInterrupt()         { HitState.EventAllowInterrupt(this);       }
+    public void Event_HitState_AllowInterrupt()         { HitState.EventAllowInterrupt();           }
+    public void Event_HitState_EndHit()                 { HitState.EventEndHit();                   }
 }

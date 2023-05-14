@@ -40,6 +40,7 @@ public class EnemyStateMachine : StateMachine
     private float   _chaseSpeed         = 1.1f;
     private float   _attackDistance     = 0.25f;
     private float   _knockbackResistance= 0.75f;
+    private float   _knockback          = 1f;
 
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;
@@ -56,6 +57,7 @@ public class EnemyStateMachine : StateMachine
     // game values
     private float   _health;
     private float   _maxHealth  = 3f;
+    private float   _damage = 10f;
 
     // pathfinding
     private Vector2 _pathfindingTarget;
@@ -73,6 +75,7 @@ public class EnemyStateMachine : StateMachine
     public float    ChaseSpeed          { get { return _chaseSpeed; }       set { _chaseSpeed = value; } }
     public float    AttackDistance      { get { return _attackDistance; }   set { _attackDistance = value; } }
     public float    KnockbackResistance { get { return _knockbackResistance; }   set { _knockbackResistance = value; } }
+    public float    Knockback           { get { return _knockback; }        set { _knockback = value; } }
     public float    Health
     {
         get { return _health; }
@@ -83,7 +86,7 @@ public class EnemyStateMachine : StateMachine
             else if (_health <= 0) { _health = 0; }
         }
     }
-
+    public float    Damage                  { get { return _damage; }               set { _damage = value; } }
     public Vector2  PathfindingTarget       { get { return _pathfindingTarget; }    set { _pathfindingTarget = value; } }
     public float    NextWaypointDistance    { get { return _nextWaypointDistance; } set { _nextWaypointDistance = value; } }
     public Path     Path                    { get { return _path; }                 set { _path = value; } }

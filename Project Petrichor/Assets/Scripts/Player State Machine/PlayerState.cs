@@ -8,8 +8,11 @@ public abstract class PlayerState
         Attack,
         Dash,
         Deflect,
+        DeflectHit,
+        Hit,
         Idle,
-        Run
+        Run,
+        Die
     }
     public abstract void EnterState(PlayerStateMachine player);
 
