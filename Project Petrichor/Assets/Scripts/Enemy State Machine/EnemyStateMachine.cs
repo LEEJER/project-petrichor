@@ -37,9 +37,9 @@ public class EnemyStateMachine : StateMachine
     private float   _movementSpeed      = 1f;
     private float   _velocityDecayRate  = 8f;
 
-    private float   _chaseSpeed         = 0.25f;
+    private float   _chaseSpeed         = 1.1f;
     private float   _attackDistance     = 0.25f;
-    private float   _knockbackResistance= 0.8f;
+    private float   _knockbackResistance= 0.75f;
 
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;

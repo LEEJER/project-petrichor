@@ -44,7 +44,7 @@ public class EnemyIdleState : EnemyState
                 // take damage
                 enemy.Health -= sword.damage;
                 // take knockback
-                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
                 // go to hit state
                 nextState = NextState.Hit;
             }
@@ -66,7 +66,7 @@ public class EnemyIdleState : EnemyState
         {
             if (other.CompareTag("Player"))
             {
-                enemy.PathfindingTarget = collision.gameObject.GetComponent<Rigidbody2D>().position;
+                enemy.PathfindingTarget = other.GetComponent<Rigidbody2D>().position;
                 nextState = NextState.Chase;
             }
         }

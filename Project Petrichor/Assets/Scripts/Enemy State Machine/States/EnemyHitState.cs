@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyHitState : EnemyState
 {
-    private float duration = 0.5f;
+    private float duration = 0.33f;
     private float time                  = 0f;
     private NextState nextState         = NextState.Nothing;
 
@@ -55,7 +55,7 @@ public class EnemyHitState : EnemyState
             {
                 Sword sword = other.GetComponent<Sword>();
                 // take knockback
-                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
             }
         }
     }

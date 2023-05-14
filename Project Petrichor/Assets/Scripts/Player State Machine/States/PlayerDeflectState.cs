@@ -12,11 +12,13 @@ public class PlayerDeflectState : PlayerState
     private Vector2     dir             = Vector2.zero;
     private NextState   startNext       = NextState.Nothing;
 
-    private Collider2D deflectBox;
+    private Transform   deflectBoxGameObject;
+    private Collider2D  deflectBox;
     public override void EnterState(PlayerStateMachine player)
     {
-        deflectBox = player.transform.Find("DeflectBox").GetComponent<Collider2D>();
-        player.currentState = PlayerStateMachine.CurrentState.Deflect;
+        deflectBoxGameObject    = player.transform.Find("DeflectBox");
+        deflectBox              = deflectBoxGameObject.GetComponent<Collider2D>();
+        player.currentState     = PlayerStateMachine.CurrentState.Deflect;
         startDeflect    = true;
         canInterrupt    = true;
         startDeflectHit = false;
@@ -44,6 +46,8 @@ public class PlayerDeflectState : PlayerState
             startDeflect = false;
             canBufferInput = false;
             //startDeflectHit = false;
+
+            deflectBoxGameObject.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, dir));
 
             
             Animate(player);
@@ -121,16 +125,14 @@ public class PlayerDeflectState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
+                deflectBox.enabled = false;
                 // take damage
                 // apply self knockback
                 // interrupt attacks
                 // goto hit state
-                if (!deflectBox.enabled)
-                {
-                    
-                }
             }
         }
+        // successful deflect
         else if (selfComponent == "DeflectBox")
         {
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))

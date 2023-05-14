@@ -84,10 +84,12 @@ public class EnemyChaseState : EnemyState
                 // take damage
                 enemy.Health -= sword.damage;
                 // take knockback
-                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
-                Debug.Log(enemy.VelocityVector);
-                // go to hit state
-                nextState = NextState.Hit;
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance/2;
+                // go to hit state (tank the firstt hit)
+                if (enemy.Health < enemy.Health / 2)
+                {
+                    nextState = NextState.Hit;
+                }
             }
         } 
         else if (selfComponent == "DetectionBox")

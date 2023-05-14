@@ -10,7 +10,7 @@ public class EnemyDeflectedState : EnemyState
 
     public override void EnterState(EnemyStateMachine enemy)
     {
-        enemy.currentState = EnemyStateMachine.CurrentState.Hit;
+        enemy.currentState = EnemyStateMachine.CurrentState.Deflected;
         nextState = NextState.Nothing;
         time = 0f;
     }
@@ -58,7 +58,7 @@ public class EnemyDeflectedState : EnemyState
                 // take damage
                 enemy.Health -= sword.damage;
                 // take knockback
-                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance * 0.6f;
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance * 0.6f;
                 // dont go to hit state
             }
         }

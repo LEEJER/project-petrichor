@@ -38,7 +38,7 @@ public class EnemyDieState : EnemyState
                 // dont take damage
                 // dont go to hit state
                 // get pushed
-                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
             }
         }
         

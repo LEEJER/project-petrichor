@@ -26,13 +26,13 @@ public class EnemyAttackState : EnemyState
         {
             case NextState.Chase:
                 enemy.SwitchState(enemy.ChaseState);
-                break;
+                return;
             case NextState.Hit:
                 enemy.SwitchState(enemy.HitState);
-                break;
+                return;
             case NextState.Deflected:
                 enemy.SwitchState(enemy.DeflectedState);
-                break;
+                return;
             default:
                 break;
         }
