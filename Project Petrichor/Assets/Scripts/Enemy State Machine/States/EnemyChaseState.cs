@@ -8,8 +8,10 @@ public class EnemyChaseState : EnemyState
     float       timeSinceLastPath   = 0f;
     float       pathUpdateInterval  = 0.12f;
     float       distanceToPlayer    = 0f;
+    private bool foundTarget = false;
     public override void EnterState(EnemyStateMachine enemy)
     {
+        foundTarget = false;
         enemy.currentState = EnemyStateMachine.CurrentState.Chase;
         nextState = NextState.Nothing;
         distanceToPlayer = 0f;
@@ -32,36 +34,43 @@ public class EnemyChaseState : EnemyState
                 break;
         }
 
-        bool canSeePlayer = CanSeePlayer(enemy);
-        // if we can attack, we should
-        if (canSeePlayer && distanceToPlayer < enemy.AttackDistance)
+        if (foundTarget)
         {
-            nextState = NextState.Attack;
-            return;
-        }
+            bool canSeePlayer = CanSeePlayer(enemy);
+            // if we can attack, we should
+            if (canSeePlayer && distanceToPlayer < enemy.AttackDistance)
+            {
+                nextState = NextState.Attack;
+                return;
+            }
 
 
-        timeSinceLastPath += Time.fixedDeltaTime;
-        if (timeSinceLastPath > pathUpdateInterval && !canSeePlayer)
-        {
-            timeSinceLastPath = 0f;
-            enemy.FindPathTo(enemy.PathfindingTarget);
-        }
+            timeSinceLastPath += Time.fixedDeltaTime;
+            if (timeSinceLastPath > pathUpdateInterval && !canSeePlayer)
+            {
+                timeSinceLastPath = 0f;
+                enemy.FindPathTo(enemy.PathfindingTarget);
+            }
 
-        // let the decision vectors take over
-        if (canSeePlayer)
-        {
-            enemy.VelocityVector = enemy.GetChaseVector(enemy.PathfindingTarget, enemy.ChaseSpeed);
-        }
-        // if there is a path and if we are not at the end of this path
-        else if (enemy.Path != null)
-        {
-            FollowPath(enemy);
-        }
-        
+            // let the decision vectors take over
+            if (canSeePlayer)
+            {
+                enemy.VelocityVector = enemy.GetChaseVector(enemy.PathfindingTarget, enemy.ChaseSpeed);
+            }
+            // if there is a path and if we are not at the end of this path
+            else if (enemy.Path != null)
+            {
+                FollowPath(enemy);
+            }
+
+            else
+            {
+
+            }
+        } 
         else
         {
-
+            nextState = NextState.Idle;
         }
     }
 
@@ -96,6 +105,7 @@ public class EnemyChaseState : EnemyState
         {
             if (other.CompareTag("Player"))
             {
+                foundTarget = true;
                 enemy.PathfindingTarget = collision.gameObject.GetComponent<Rigidbody2D>().position;
             }
         }
@@ -108,6 +118,7 @@ public class EnemyChaseState : EnemyState
         {
             if (other.CompareTag("Player"))
             {
+                foundTarget = true;
                 enemy.PathfindingTarget = collision.gameObject.GetComponent<Rigidbody2D>().position;
             }
         }
@@ -119,6 +130,7 @@ public class EnemyChaseState : EnemyState
         {
             if (other.CompareTag("Player"))
             {
+                foundTarget = false;
                 nextState = NextState.Idle;
                 enemy.Path = null;
             }

@@ -9,7 +9,7 @@ public class PlayerHitState : PlayerState
     private bool canInterrupt = false;
     public override void EnterState(PlayerStateMachine player)
     {
-        Debug.Log("player was hit, coming from: " + player.currentState);
+        //Debug.Log("player was hit, coming from: " + player.currentState);
         player.currentState = PlayerStateMachine.CurrentState.Hit;
         Animate(player);
         canInterrupt = false;

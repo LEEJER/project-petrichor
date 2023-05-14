@@ -33,7 +33,7 @@ public class PlayerRunState : PlayerState
                 player.SwitchState(player.HitState);
                 break;
             case NextState.Die:
-                //player.SwitchState(player.DieState);
+                player.SwitchState(player.DieState);
                 break;
             default:
                 if (player.InputVector != Vector2.zero)
@@ -94,10 +94,7 @@ public class PlayerRunState : PlayerState
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
                 EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
-                // take damage
-                player.Health += enemy.Damage;
-                // apply self knockback
-                player.VelocityVector += enemy.VelocityVector.normalized * enemy.Knockback * player.SelfKnockback;
+                player.GetHit(enemy);
                 // interrupt attacks
                 // goto hit state
                 nextState = NextState.Hit;

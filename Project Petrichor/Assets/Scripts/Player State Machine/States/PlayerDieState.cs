@@ -7,7 +7,6 @@ public class PlayerDieState : PlayerState
 {
     public override void EnterState(PlayerStateMachine player)
     {
-        Debug.Log("Player should be dead: " + player.currentState);
         player.currentState = PlayerStateMachine.CurrentState.Die;
         Animate(player);
     }

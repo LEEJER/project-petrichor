@@ -71,6 +71,8 @@ public class EnemyStateMachine : StateMachine
     private bool    _reachedEndOfPath;
     private Seeker  _seeker;
 
+    public GameManager gameManager;
+
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
     public Vector2  LastAttackVector    { get { return _lastAttackVector; } set { _lastAttackVector = value; } }
@@ -110,6 +112,7 @@ public class EnemyStateMachine : StateMachine
         _movementFilter.SetLayerMask(LayerMask.GetMask("Environment"));
         _movementFilter.useLayerMask = true;
 
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         _health = _maxHealth;
 
@@ -183,7 +186,7 @@ public class EnemyStateMachine : StateMachine
 
     public void RemoveSelf()
     {
-        EnemyManager.RunEnemyDie();
+        gameManager.Run_OnEnemyDie();
         Destroy(gameObject);
     }
 

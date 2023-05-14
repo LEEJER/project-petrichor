@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-//using UnityEngine.UIElements;
-using UnityEngine.Events;
 
 public class PlayerStateMachine : StateMachine
 {
@@ -80,7 +78,6 @@ public class PlayerStateMachine : StateMachine
     public float    MaxHealth           { get { return _maxHealth; }        set { _maxHealth = value; } }
     //public float    MaxVelocity         { get { return _maxVelocity; }      set { _maxVelocity = value; } }
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -97,17 +94,28 @@ public class PlayerStateMachine : StateMachine
 
         _health = 0f;
 
-        EnemyManager.OnDie += AddHealth;
+        
 
         // Initial state is IDLE
         _currentState = IdleState;
         _currentState.EnterState(this);
     }
 
+    private void OnEnable()
+    {
+        GameManager.instance.OnEnemyDie.AddListener(AddHealth);
+    }
+
+    private void OnDisable()
+    {
+        GameManager.instance.OnEnemyDie.RemoveListener(AddHealth);
+    }
+
     private void FixedUpdate()
     {
         _health += _barRate * Time.deltaTime;
-        HealthBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Min(200f, _health * 2f));
+        if (_health > _maxHealth) { _health = _maxHealth; }
+        GameManager.instance.SetBarPercentage(_health / _maxHealth);
         MovePlayerBasedOnVelocity();
         _currentState.UpdateState(this);
     }
@@ -214,7 +222,6 @@ public class PlayerStateMachine : StateMachine
 
     public void DestroyThisObject()
     {
-        EnemyManager.OnDie -= AddHealth;
         Destroy(gameObject);
     }
 
