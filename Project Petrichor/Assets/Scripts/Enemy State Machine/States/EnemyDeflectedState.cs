@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHitState : EnemyState
+public class EnemyDeflectedState : EnemyState
 {
-    private float duration = 0.5f;
+    private float duration              = 3f;
     private float time                  = 0f;
     private NextState nextState         = NextState.Nothing;
 
@@ -48,14 +48,18 @@ public class EnemyHitState : EnemyState
     public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)
     {
         GameObject other = collision.gameObject;
+        // if our hitbox is hit
         if (selfComponent == "Hitbox")
         {
             // if we are hit by the player hurtbox
             if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
             {
                 Sword sword = other.GetComponent<Sword>();
+                // take damage
+                enemy.Health -= sword.damage;
                 // take knockback
-                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
+                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance * 0.6f;
+                // dont go to hit state
             }
         }
     }

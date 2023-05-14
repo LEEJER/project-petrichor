@@ -10,7 +10,7 @@ public class Sword : MonoBehaviour
     public int          num                 = 0;
     public Vector2      dir                 = Vector2.zero;
     public float        swingMovementSpeed  = 1.45f;
-    public float        knockbackForce      = 2.5f;
+    public float        knockbackForce      = 2f;
     public float        hitboxOffset        = 0.12f;
 
     private Animator    animator;

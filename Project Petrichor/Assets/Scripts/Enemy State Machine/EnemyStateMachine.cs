@@ -12,7 +12,8 @@ public class EnemyStateMachine : StateMachine
         Chase,
         Hit,
         Die,
-        Patrol
+        Patrol,
+        Deflected
     }
 
     private EnemyState          _currentState;
@@ -22,6 +23,7 @@ public class EnemyStateMachine : StateMachine
     public  EnemyHitState       HitState        = new EnemyHitState();
     public  EnemyDieState       DieState        = new EnemyDieState();
     public  EnemyPatrolState    PatrolState     = new EnemyPatrolState();
+    public  EnemyDeflectedState DeflectedState  = new EnemyDeflectedState();
 
     public CurrentState currentState;
 
@@ -37,6 +39,7 @@ public class EnemyStateMachine : StateMachine
 
     private float   _chaseSpeed         = 0.25f;
     private float   _attackDistance     = 0.25f;
+    private float   _knockbackResistance= 0.8f;
 
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;
@@ -69,6 +72,7 @@ public class EnemyStateMachine : StateMachine
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
     public float    ChaseSpeed          { get { return _chaseSpeed; }       set { _chaseSpeed = value; } }
     public float    AttackDistance      { get { return _attackDistance; }   set { _attackDistance = value; } }
+    public float    KnockbackResistance { get { return _knockbackResistance; }   set { _knockbackResistance = value; } }
     public float    Health
     {
         get { return _health; }

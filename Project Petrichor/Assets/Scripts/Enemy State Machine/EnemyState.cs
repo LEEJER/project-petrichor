@@ -12,7 +12,8 @@ public abstract class EnemyState
         Chase,
         Attack,
         Hit,
-        Die
+        Die,
+        Deflected
     }
 
     public abstract void EnterState(EnemyStateMachine enemy);

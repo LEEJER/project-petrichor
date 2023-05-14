@@ -40,7 +40,7 @@ public class EnemyIdleState : EnemyState
             // if we are hit by the player hurtbox
             if (other.layer == LayerMask.NameToLayer("Player") && other.CompareTag("Hurtbox"))
             {
-                Sword sword = other.GetComponent<PlayerStateMachine>().sword;
+                Sword sword = other.GetComponent<Sword>();
                 // take damage
                 enemy.Health -= sword.damage;
                 // take knockback
@@ -76,3 +76,4 @@ public class EnemyIdleState : EnemyState
     {
 
     }
+}

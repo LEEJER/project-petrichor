@@ -30,6 +30,9 @@ public class EnemyAttackState : EnemyState
             case NextState.Hit:
                 enemy.SwitchState(enemy.HitState);
                 break;
+            case NextState.Deflected:
+                enemy.SwitchState(enemy.DeflectedState);
+                break;
             default:
                 break;
         }
@@ -94,7 +97,7 @@ public class EnemyAttackState : EnemyState
                     if (cooldown || enemy.Health <= 0)
                     {
                         // take knockback
-                        enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                        enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
                         cooldown = false;
                         // goto hit state
                         nextState = NextState.Hit;
@@ -108,9 +111,9 @@ public class EnemyAttackState : EnemyState
             {
                 if (other.CompareTag("DeflectBox"))
                 {
-                    nextState = NextState.Hit;
+                    nextState = NextState.Deflected;
                     hurtbox.enabled = false;
-                    enemy.VelocityVector = -enemy.VelocityVector.normalized * other.transform.parent.GetComponent<PlayerStateMachine>().DeflectKnockback;
+                    enemy.VelocityVector = -enemy.VelocityVector.normalized * other.transform.parent.GetComponent<PlayerStateMachine>().DeflectKnockback * enemy.KnockbackResistance;
                 }
 
             }

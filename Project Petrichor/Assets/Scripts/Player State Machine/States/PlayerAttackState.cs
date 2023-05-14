@@ -26,37 +26,60 @@ public class PlayerAttackState : PlayerState
 
     public override void UpdateState(PlayerStateMachine player)
     {
+        
+
         // run the attack
         if (startAttack && canInterrupt)
         {
             dir = player.RelativeMousePos.normalized;
             Animate(player);
+            player.sword.SwordAttack(dir, attackNum);
 
+            startNext       = NextState.Nothing;
             canInterrupt    = false;
             startAttack     = false;
             canBufferInput  = false;
-            startNext = NextState.Nothing;
 
-            player.sword.SwordAttack(dir, attackNum);
-            player.VelocityVector = (player.VelocityVector * 0.5f) + dir.normalized * player.sword.swingMovementSpeed;
-            attackNum = (attackNum + 1) % 2;
+            player.VelocityVector   = (player.VelocityVector * 0.5f) + dir.normalized * player.sword.swingMovementSpeed;
+            attackNum               = (attackNum + 1) % 2;
+        }
+        else if (canInterrupt)
+        {
+            switch (startNext)
+            {
+                case NextState.Deflect:
+                    player.animator.SetTrigger("t_deflect");
+                    Interrupt(player, player.DeflectState);
+                    break;
+                case NextState.Dash:
+                    player.animator.SetTrigger("t_dash");
+                    Interrupt(player, player.DashState);
+                    break;
+                default:
+                    if (!startAttack && player.InputVector != Vector2.zero)
+                    {
+                        player.FacingVector = player.InputVector;
+                        Interrupt(player, player.IdleState);
+                    }
+                    break;
+            }
         }
 
-        else if (startNext == NextState.Deflect && canInterrupt)
-        {
-            player.animator.SetTrigger("t_deflect");
-            Interrupt(player, player.DeflectState);
-        }
-        else if (startNext == NextState.Dash && canInterrupt)
-        {
-            player.animator.SetTrigger("t_dash");
-            Interrupt(player, player.DashState);
-        }
-        else if (player.InputVector != Vector2.zero && canInterrupt)
-        {
-            player.FacingVector = player.InputVector;
-            Interrupt(player, player.IdleState);
-        }
+        //else if (startNext == NextState.Deflect && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_deflect");
+        //    Interrupt(player, player.DeflectState);
+        //}
+        //else if (startNext == NextState.Dash && canInterrupt)
+        //{
+        //    player.animator.SetTrigger("t_dash");
+        //    Interrupt(player, player.DashState);
+        //}
+        //else if (player.InputVector != Vector2.zero && canInterrupt)
+        //{
+        //    player.FacingVector = player.InputVector;
+        //    Interrupt(player, player.IdleState);
+        //}
     }
 
     public override void ExitState(PlayerStateMachine player)
@@ -64,7 +87,7 @@ public class PlayerAttackState : PlayerState
         startAttack     = false;
         canInterrupt    = true;
         startNext       = NextState.Nothing;
-        canBufferInput = false;
+        canBufferInput  = false;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -106,12 +129,12 @@ public class PlayerAttackState : PlayerState
             // if we hit an enemy, specifically the hitbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hitbox"))
             {
-                // if the enemy is not currently hit
-                if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Hit)
-                {
                     // apply self knockback
-                    player.VelocityVector += -1f * player.sword.dir.normalized * (player.sword.knockbackForce / 1.5f);
-                }
+                    player.VelocityVector += -1f * player.sword.dir.normalized * (player.sword.knockbackForce * player.SelfKnockback);
+                // if the enemy is not currently hit
+                //if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Hit)
+                //{
+                //}
             }
         }
         else if (selfComponent == "Hitbox")

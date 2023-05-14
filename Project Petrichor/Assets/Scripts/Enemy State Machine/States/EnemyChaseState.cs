@@ -17,27 +17,29 @@ public class EnemyChaseState : EnemyState
 
     public override void UpdateState(EnemyStateMachine enemy)
     {
+        switch (nextState)
+        {
+            case NextState.Idle:
+                enemy.SwitchState(enemy.IdleState);
+                return;
+            case NextState.Attack:
+                enemy.SwitchState(enemy.AttackState);
+                return;
+            case NextState.Hit:
+                enemy.SwitchState(enemy.HitState);
+                return;
+            default:
+                break;
+        }
+
         bool canSeePlayer = CanSeePlayer(enemy);
         // if we can attack, we should
         if (canSeePlayer && distanceToPlayer < enemy.AttackDistance)
         {
             nextState = NextState.Attack;
+            return;
         }
 
-        switch (nextState)
-        {
-            case NextState.Idle:
-                enemy.SwitchState(enemy.IdleState);
-                break;
-            case NextState.Attack:
-                enemy.SwitchState(enemy.AttackState);
-                break;
-            case NextState.Hit:
-                enemy.SwitchState(enemy.HitState);
-                break;
-            default:
-                break;
-        }
 
         timeSinceLastPath += Time.fixedDeltaTime;
         if (timeSinceLastPath > pathUpdateInterval && !canSeePlayer)
@@ -82,7 +84,8 @@ public class EnemyChaseState : EnemyState
                 // take damage
                 enemy.Health -= sword.damage;
                 // take knockback
-                enemy.VelocityVector += sword.dir.normalized * sword.knockbackForce;
+                enemy.VelocityVector = sword.dir.normalized * sword.knockbackForce * enemy.KnockbackResistance;
+                Debug.Log(enemy.VelocityVector);
                 // go to hit state
                 nextState = NextState.Hit;
             }
