@@ -33,7 +33,7 @@ public class PlayerIdleState : PlayerState
                 player.SwitchState(player.HitState);
                 break;
             case NextState.Die:
-                //player.SwitchState(player.DieState);
+                player.SwitchState(player.DieState);
                 break;
             default:
                 if (player.InputVector != Vector2.zero)
@@ -57,7 +57,7 @@ public class PlayerIdleState : PlayerState
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started || context.performed)
+        if (context.started)
         {
             player.FacingVector = context.ReadValue<Vector2>();
         }
@@ -65,7 +65,7 @@ public class PlayerIdleState : PlayerState
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             nextState = NextState.Attack;
         }
@@ -74,14 +74,14 @@ public class PlayerIdleState : PlayerState
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             nextState = NextState.Dash;
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             nextState = NextState.Deflect;
         }
@@ -95,10 +95,11 @@ public class PlayerIdleState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                // take damage
-                // apply self knockback
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
+                player.GetHit(enemy);
                 // interrupt attacks
                 // goto hit state
+                nextState = NextState.Hit;
             }
         }
     }

@@ -40,10 +40,11 @@ public class EnemyStateMachine : StateMachine
     private float   _chaseSpeed         = 1.1f;
     private float   _attackDistance     = 0.25f;
     private float   _knockbackResistance= 0.75f;
-    private float   _knockback          = 1f;
+    private float   _knockback          = 2.2f;
 
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;
+    private Vector2 _lastAttackVector   = Vector2.zero;
     //private Vector2 _desireVector       = Vector2.zero;
     public Vector2[]    DesireVectors   = new Vector2[12];
     public float[]      DesireWeights   = new float[12];
@@ -69,6 +70,7 @@ public class EnemyStateMachine : StateMachine
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
+    public Vector2  LastAttackVector    { get { return _lastAttackVector; } set { _lastAttackVector = value; } }
     //public Vector2  DesireVector        { get { return _desireVector; }     set { _desireVector = value; } }
     public Animator animator            { get { return _animator; } private set { _animator = value; } }
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }

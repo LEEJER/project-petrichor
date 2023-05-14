@@ -28,4 +28,5 @@ public class PlayerAnimator : MonoBehaviour
     public void Event_DeflectHitState_EndDeflectHit()   { sm.Event_DeflectHitState_EndDeflectHit(); }
     public void Event_HitState_AllowInterrupt()         { sm.Event_HitState_AllowInterrupt(); }
     public void Event_HitState_EndHit()                 { sm.Event_HitState_EndHit(); }
+    public void Event_DieState_EndDie()                 { sm.Event_DieState_EndDie(); }
 }

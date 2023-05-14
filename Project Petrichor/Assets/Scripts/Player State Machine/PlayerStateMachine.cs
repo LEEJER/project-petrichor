@@ -13,7 +13,8 @@ public class PlayerStateMachine : StateMachine
         Run,
         Deflect,
         DeflectHit,
-        Hit
+        Hit,
+        Die
     }
 
     // STATE MACHINE STUFF
@@ -25,6 +26,7 @@ public class PlayerStateMachine : StateMachine
     public  PlayerDeflectState      DeflectState    = new PlayerDeflectState();
     public  PlayerDeflectHitState   DeflectHitState = new PlayerDeflectHitState();
     public  PlayerHitState          HitState        = new PlayerHitState();
+    public  PlayerDieState          DieState        = new PlayerDieState();
 
     public CurrentState currentState;
     // STATE MACHINE STUFF END
@@ -199,6 +201,19 @@ public class PlayerStateMachine : StateMachine
         _velocityVector += vel;
     }
 
+    public void DestroyThisObject()
+    {
+        Destroy(gameObject);
+    }
+
+    public void GetHit(EnemyStateMachine enemy)
+    {
+        _health += enemy.Damage;
+        // apply self knockback
+        _velocityVector += enemy.LastAttackVector.normalized * enemy.Knockback * _selfKnockback;
+        _facingVector = -_velocityVector.normalized;
+    }
+
     public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt();        }
     public void Event_AttackState_EndSwordAttack()      { AttackState.EventEndSwordAttack(this);    }
     public void Event_AttackState_AllowBuffer()         { AttackState.EventAllowBuffer(this);       }
@@ -214,4 +229,5 @@ public class PlayerStateMachine : StateMachine
     public void Event_DeflectHitState_EndDeflectHit()   { DeflectHitState.EventEndDeflectHit(this); }
     public void Event_HitState_AllowInterrupt()         { HitState.EventAllowInterrupt();           }
     public void Event_HitState_EndHit()                 { HitState.EventEndHit();                   }
+    public void Event_DieState_EndDie()                 { DieState.EventEndDie(this); }
 }

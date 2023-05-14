@@ -55,6 +55,7 @@ public class EnemyAttackState : EnemyState
             {
                 hurtbox.enabled = true;
                 enemy.VelocityVector = (enemy.PathfindingTarget - enemy.EnemyRigidbody.position).normalized * 3f;
+                enemy.LastAttackVector = enemy.VelocityVector.normalized;
                 cooldown = true;
                 time += Time.fixedDeltaTime;
                 // automatically go into the chase state after finishing an attack
@@ -109,13 +110,21 @@ public class EnemyAttackState : EnemyState
         {
             if (other.layer == LayerMask.NameToLayer("Player"))
             {
-                if (other.CompareTag("DeflectBox"))
+                if (other.CompareTag("Hitbox"))
                 {
-                    nextState = NextState.Deflected;
-                    hurtbox.enabled = false;
-                    enemy.VelocityVector = -enemy.VelocityVector.normalized * other.transform.parent.GetComponent<PlayerStateMachine>().DeflectKnockback * enemy.KnockbackResistance;
+                    PlayerDeflectState playerDeflect = other.transform.parent.GetComponent<PlayerStateMachine>().DeflectState;
+                    float deflectAngle = Vector2.Angle(playerDeflect.dir, -enemy.LastAttackVector.normalized);
+                    if (playerDeflect.hasDeflectFrames && deflectAngle < 30f)
+                    {
+                        nextState = NextState.Deflected;
+                        hurtbox.enabled = false;
+                        enemy.VelocityVector = -enemy.LastAttackVector.normalized * other.transform.parent.GetComponent<PlayerStateMachine>().DeflectKnockback * enemy.KnockbackResistance;
+                    }
+                    else
+                    {
+                        enemy.VelocityVector = -enemy.LastAttackVector.normalized * enemy.Knockback;
+                    }
                 }
-
             }
         }
     }

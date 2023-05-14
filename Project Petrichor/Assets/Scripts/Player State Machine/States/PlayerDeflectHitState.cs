@@ -100,21 +100,21 @@ public class PlayerDeflectHitState : PlayerState
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { nextState = NextState.Attack; }
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { nextState = NextState.Dash; }
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { nextState = NextState.Deflect; }
         }
@@ -129,10 +129,7 @@ public class PlayerDeflectHitState : PlayerState
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
                 EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
-                // take damage
-                player.Health += enemy.Damage;
-                // apply self knockback
-                player.VelocityVector += enemy.VelocityVector.normalized * enemy.Knockback * player.SelfKnockback;
+                player.GetHit(enemy);
                 // interrupt attacks
                 canInterrupt = true;
                 // goto hit state

@@ -923,7 +923,7 @@ MonoBehaviour:
     file_cachedStartup: {fileID: 0}
     data_cachedStartup: 
     cacheStartup: 0
-  showNavGraphs: 1
+  showNavGraphs: 0
   showUnwalkableNodes: 1
   debugMode: 0
   debugFloor: 0
@@ -1307,27 +1307,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &1975965673 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1625772401, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
-  m_PrefabInstance: {fileID: 4358281715673495312}
-  m_PrefabAsset: {fileID: 0}
---- !u!70 &1975965677
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1975965673}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.08, y: 0}
-  m_Size: {x: 0.08, y: 0.18}
-  m_Direction: 0
 --- !u!1 &1983445354
 GameObject:
   m_ObjectHideFlags: 0
@@ -4351,6 +4330,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1625772401, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1625772402, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -4361,15 +4344,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1625772403, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
       propertyPath: m_Radius
-      value: 0.03
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1625772403, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1625772403, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
       propertyPath: m_Offset.x
-      value: 0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3126387061210021522, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
       propertyPath: m_Name
@@ -4419,8 +4402,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -6.13
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1625772403, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
 --- !u!1001 &5357061419911994115
 PrefabInstance:

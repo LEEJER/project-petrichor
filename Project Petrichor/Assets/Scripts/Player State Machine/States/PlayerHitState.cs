@@ -9,6 +9,7 @@ public class PlayerHitState : PlayerState
     private bool canInterrupt = false;
     public override void EnterState(PlayerStateMachine player)
     {
+        Debug.Log("player was hit, coming from: " + player.currentState);
         player.currentState = PlayerStateMachine.CurrentState.Hit;
         Animate(player);
         canInterrupt = false;
@@ -25,7 +26,7 @@ public class PlayerHitState : PlayerState
             switch (nextState)
             {
                 case NextState.Die:
-                    //player.SwitchState()
+                    player.SwitchState(player.DieState);
                     break;
                 case NextState.Attack:
                     player.SwitchState(player.AttackState);
@@ -35,6 +36,9 @@ public class PlayerHitState : PlayerState
                     break;
                 case NextState.Deflect:
                     player.SwitchState(player.DeflectState);
+                    break;
+                case NextState.Idle:
+                    player.SwitchState(player.IdleState);
                     break;
                 default:
                     if (player.InputVector != Vector2.zero)

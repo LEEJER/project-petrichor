@@ -26,8 +26,6 @@ public class PlayerAttackState : PlayerState
 
     public override void UpdateState(PlayerStateMachine player)
     {
-        
-
         // run the attack
         if (startAttack && canInterrupt)
         {
@@ -57,8 +55,11 @@ public class PlayerAttackState : PlayerState
                 case NextState.Dash:
                     Interrupt(player, player.DashState);
                     break;
+                case NextState.Hit:
+                    Interrupt(player, player.HitState);
+                    break;
                 case NextState.Die:
-                    //Interrupt(player, player.DieState);
+                    Interrupt(player, player.DieState);
                     break;
                 default:
                     if (player.InputVector != Vector2.zero)
@@ -109,21 +110,21 @@ public class PlayerAttackState : PlayerState
     {
         if (context.started)
         {
-            if (canBufferInput) { startAttack = true; }
+            if (canBufferInput && nextState != NextState.Hit) { startAttack = true; }
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            if (canBufferInput) { nextState = NextState.Dash; }
+            if (canBufferInput && nextState != NextState.Hit) { nextState = NextState.Dash; }
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            if (canBufferInput) { nextState = NextState.Deflect; }
+            if (canBufferInput && nextState != NextState.Hit) { nextState = NextState.Deflect; }
         }
     }
     public override void OnHitboxEnter(PlayerStateMachine player, Collider2D collision, string selfComponent)
@@ -134,8 +135,8 @@ public class PlayerAttackState : PlayerState
             // if we hit an enemy, specifically the hitbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hitbox"))
             {
-                    // apply self knockback
-                    player.VelocityVector += -1f * player.sword.dir.normalized * (player.sword.knockbackForce * player.SelfKnockback);
+                // apply self knockback
+                player.VelocityVector += -1f * player.sword.dir.normalized * (player.sword.knockbackForce * player.SelfKnockback);
                 // if the enemy is not currently hit
                 //if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Hit)
                 //{
@@ -147,10 +148,13 @@ public class PlayerAttackState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                // take damage
-                // apply self knockback
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
+                player.GetHit(enemy);
                 // interrupt attacks
+                canInterrupt = true;
+                player.sword.StopAttack();
                 // goto hit state
+                nextState = NextState.Hit;
             }
         }
     }

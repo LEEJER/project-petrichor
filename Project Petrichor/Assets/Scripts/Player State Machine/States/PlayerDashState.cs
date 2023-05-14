@@ -100,21 +100,21 @@ public class PlayerDashState : PlayerState
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             nextState = NextState.Attack;
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             startDash = true;
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             nextState = NextState.Deflect;
         }
@@ -129,10 +129,12 @@ public class PlayerDashState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                // take damage
-                // apply self knockback
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
+                player.GetHit(enemy);
                 // interrupt attacks
+                canInterrupt = true;
                 // goto hit state
+                nextState = NextState.Hit;
             }
         }
     }

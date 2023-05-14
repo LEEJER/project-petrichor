@@ -38,6 +38,12 @@ public class Sword : MonoBehaviour
         swordHitBox.enabled = true;
     }
 
+    public void StopAttack()
+    {
+        DisableSwordHitbox();
+        animator.SetTrigger("t_interrupt");
+    }
+
     public void SwordAttack(Vector2 direction, int number)
     {
         transform.rotation = Quaternion.Euler(0, 0, 0);

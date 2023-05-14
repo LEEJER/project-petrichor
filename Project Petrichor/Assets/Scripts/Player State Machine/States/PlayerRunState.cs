@@ -93,10 +93,14 @@ public class PlayerRunState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
                 // take damage
+                player.Health += enemy.Damage;
                 // apply self knockback
+                player.VelocityVector += enemy.VelocityVector.normalized * enemy.Knockback * player.SelfKnockback;
                 // interrupt attacks
                 // goto hit state
+                nextState = NextState.Hit;
             }
         }
     }

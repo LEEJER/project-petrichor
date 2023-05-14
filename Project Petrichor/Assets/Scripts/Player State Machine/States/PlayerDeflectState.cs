@@ -9,18 +9,24 @@ public class PlayerDeflectState : PlayerState
     private bool        canInterrupt    = false;
     private bool        startDeflect    = false;
     //private bool        startDeflectHit = false;
-    private Vector2     dir             = Vector2.zero;
+    public Vector2     dir             = Vector2.zero;
     private NextState   nextState       = NextState.Nothing;
 
-    private Transform   deflectBoxGameObject;
-    private Collider2D  deflectBox;
+    public bool hasDeflectFrames = false;
+
+    //private Transform   deflectBoxGameObject;
+    //private Collider2D deflectBox;
     public override void EnterState(PlayerStateMachine player)
     {
-        deflectBoxGameObject    = player.transform.Find("DeflectBox");
-        deflectBox              = deflectBoxGameObject.GetComponent<Collider2D>();
+        //deflectBoxGameObject    = player.transform.Find("DeflectBox");
+        //deflectBox = deflectBoxGameObject.GetComponent<Collider2D>();
         player.currentState     = PlayerStateMachine.CurrentState.Deflect;
         startDeflect    = true;
         canInterrupt    = true;
+        hasDeflectFrames = true;
+
+        //deflectBox.enabled = false;
+
         //startDeflectHit = false;
         nextState       = NextState.Nothing;
         canBufferInput = true;
@@ -42,13 +48,14 @@ public class PlayerDeflectState : PlayerState
         //else 
         if (startDeflect && canInterrupt)
         {
-            deflectBox.enabled = true;
+            //deflectBox.enabled = true;
             canInterrupt = false;
             startDeflect = false;
             canBufferInput = false;
+            
             //startDeflectHit = false;
 
-            deflectBoxGameObject.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, dir));
+            //deflectBoxGameObject.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, dir));
 
             
             Animate(player);
@@ -113,7 +120,8 @@ public class PlayerDeflectState : PlayerState
         //startDeflectHit = false;
         nextState = NextState.Nothing;
         canBufferInput = false;
-        deflectBox.enabled = false;
+        hasDeflectFrames = false;
+        //deflectBox.enabled = false;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
@@ -128,25 +136,31 @@ public class PlayerDeflectState : PlayerState
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { nextState = NextState.Attack; }
         }
     }
     public override void OnDash(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { nextState = NextState.Dash; }
         }
     }
     public override void OnDeflect(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && nextState != NextState.Hit)
         {
             if (canBufferInput) { 
                 startDeflect = true;
+                hasDeflectFrames = true;
                 dir = player.RelativeMousePos.normalized;
+            }
+            // prevent spamming
+            if (!canInterrupt)
+            {
+                hasDeflectFrames = false;
             }
         }
     }
@@ -159,26 +173,45 @@ public class PlayerDeflectState : PlayerState
             // if our hitbox was hit by enemy hurtbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
             {
-                deflectBox.enabled = false;
-                // take damage
-                // apply self knockback
-                // interrupt attacks
-                // goto hit state
+                EnemyStateMachine enemy = other.transform.parent.GetComponent<EnemyStateMachine>();
+                float deflectAngle = Vector2.Angle(dir, -enemy.LastAttackVector.normalized);
+                //Debug.Log(deflectAngle);
+
+                if (hasDeflectFrames && deflectAngle <= 30f)
+                {
+                    player.VelocityVector = enemy.LastAttackVector.normalized * player.DeflectKnockback * player.SelfKnockback;
+                    //startDeflectHit = true;
+                    nextState = NextState.DeflectHit;
+                    startDeflect = false;
+                    canBufferInput = false;
+                    canInterrupt = true;
+                    //deflectBox.enabled = true;
+                }
+                else
+                {
+                    //deflectBox.enabled = false;
+                    player.GetHit(enemy);
+
+                    // interrupt attacks
+                    canInterrupt = true;
+                    // goto hit state
+                    nextState = NextState.Hit;
+                }
             }
         }
         // successful deflect
-        else if (selfComponent == "DeflectBox")
-        {
-            if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
-            {
-                player.VelocityVector = other.transform.parent.GetComponent<EnemyStateMachine>().VelocityVector.normalized * player.DeflectKnockback * player.SelfKnockback;
-                //startDeflectHit = true;
-                nextState = NextState.DeflectHit;
-                startDeflect = false;
-                canBufferInput = false;
-                canInterrupt = true;
-            }
-        }
+        //else if (selfComponent == "DeflectBox")
+        //{
+        //    if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hurtbox"))
+        //    {
+        //        player.VelocityVector = other.transform.parent.GetComponent<EnemyStateMachine>().VelocityVector.normalized * player.DeflectKnockback * player.SelfKnockback;
+        //        //startDeflectHit = true;
+        //        nextState = NextState.DeflectHit;
+        //        startDeflect = false;
+        //        canBufferInput = false;
+        //        canInterrupt = true;
+        //    }
+        //}
     }
     public override void OnHitboxStay(PlayerStateMachine player, Collider2D collision, string selfComponent)
     {
@@ -222,6 +255,7 @@ public class PlayerDeflectState : PlayerState
 
     public void EventRemoveDeflectFrames()
     {
-        deflectBox.enabled = false;
+        //deflectBox.enabled = false;
+        hasDeflectFrames = false;
     }
 }
