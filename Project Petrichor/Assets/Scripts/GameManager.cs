@@ -8,14 +8,19 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public GameObject UIManager;
-    public PlayerManager PlayerManager;
-    public EnemyManager EnemyManager;
-    public GameObject Environment;
+    public GameObject       UIManager;
+    public PlayerManager    PlayerManager;
+    public EnemyManager     EnemyManager;
+    public GameObject       Environment;
 
     private Transform _healthBarObject;
     private Transform _healthBar;
     private Transform _canvas;
+
+    [SerializeField]
+    private float _playerTime;
+    [SerializeField]
+    private float _playerKills;
 
     [SerializeField]
     public UnityEvent OnEnemyDie;
@@ -29,6 +34,16 @@ public class GameManager : MonoBehaviour
         
 
         UIManager = GameObject.Find("UIManager");
+        if (UIManager != null)
+        {
+            _canvas = UIManager.transform.Find("Canvas");
+            _healthBarObject = _canvas.transform.Find("HealthBar");
+            if (_healthBarObject != null)
+            {
+                _healthBar = _healthBarObject.transform.Find("Bar");
+            }
+        }
+
         GameObject playerManager = GameObject.Find("PlayerManager");
         if (playerManager != null)
         {
@@ -40,9 +55,7 @@ public class GameManager : MonoBehaviour
             EnemyManager = enemyManager.GetComponent<EnemyManager>();
         }
 
-        _canvas = UIManager.transform.Find("Canvas");
-        _healthBarObject = _canvas.transform.Find("HealthBar");
-        _healthBar = _healthBarObject.transform.Find("Bar");
+        
     }
 
     private void Awake()
@@ -66,10 +79,16 @@ public class GameManager : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SavePlayerScore()
     {
-        
+        _playerKills = PlayerManager.EnemiesKilled;
+        _playerTime = PlayerManager.TimeAlive;
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+
     }
 
     private void OnDisable()
