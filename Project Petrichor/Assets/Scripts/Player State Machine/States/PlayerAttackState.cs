@@ -135,12 +135,17 @@ public class PlayerAttackState : PlayerState
             // if we hit an enemy, specifically the hitbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hitbox"))
             {
-                // apply self knockback
-                player.VelocityVector += -1f * player.sword.dir.normalized * (player.sword.knockbackForce * player.SelfKnockback);
-                // if the enemy is not currently hit
-                //if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Hit)
-                //{
-                //}
+                
+                // only apply large knockback if enemy was not deflected
+                if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Deflected)
+                {
+                    // apply self knockback
+                    player.VelocityVector += -player.sword.dir.normalized * player.sword.knockbackForce * player.SelfKnockback;
+                }
+                else
+                {
+                    player.VelocityVector += -player.sword.dir.normalized * player.sword.knockbackForce * player.SelfKnockback * 0.2f;
+                }
             }
         }
         else if (selfComponent == "Hitbox")

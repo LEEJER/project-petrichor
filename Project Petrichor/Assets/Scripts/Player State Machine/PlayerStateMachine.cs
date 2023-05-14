@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+//using UnityEngine.UIElements;
+using UnityEngine.Events;
 
 public class PlayerStateMachine : StateMachine
 {
@@ -56,8 +59,11 @@ public class PlayerStateMachine : StateMachine
     private Rigidbody2D _playerRigidBody;
     private Collider2D  _playerCollider;
 
+    public Image HealthBar;
+
     private float _health = 0f;
     private float _maxHealth = 100f;
+    private float _barRate = 1f;
 
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
@@ -84,11 +90,14 @@ public class PlayerStateMachine : StateMachine
         _playerCollider     = GetComponent<Collider2D>();
         _sword              = transform.Find("Sword").GetComponent<Sword>();
 
+
         _movementFilter = new ContactFilter2D();
         _movementFilter.SetLayerMask(LayerMask.GetMask("Environment"));
         _movementFilter.useLayerMask = true;
 
         _health = 0f;
+
+        EnemyManager.OnDie += AddHealth;
 
         // Initial state is IDLE
         _currentState = IdleState;
@@ -97,6 +106,8 @@ public class PlayerStateMachine : StateMachine
 
     private void FixedUpdate()
     {
+        _health += _barRate * Time.deltaTime;
+        HealthBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Min(200f, _health * 2f));
         MovePlayerBasedOnVelocity();
         _currentState.UpdateState(this);
     }
@@ -203,6 +214,7 @@ public class PlayerStateMachine : StateMachine
 
     public void DestroyThisObject()
     {
+        EnemyManager.OnDie -= AddHealth;
         Destroy(gameObject);
     }
 
@@ -212,6 +224,11 @@ public class PlayerStateMachine : StateMachine
         // apply self knockback
         _velocityVector += enemy.LastAttackVector.normalized * enemy.Knockback * _selfKnockback;
         _facingVector = -_velocityVector.normalized;
+    }
+
+    public void AddHealth()
+    {
+        _health = Mathf.Max(_health - 10f, 0f);
     }
 
     public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt();        }

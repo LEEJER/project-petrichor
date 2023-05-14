@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
+using UnityEngine.Events;
 
 public class EnemyStateMachine : StateMachine
 {
@@ -26,6 +27,8 @@ public class EnemyStateMachine : StateMachine
     public  EnemyDeflectedState DeflectedState  = new EnemyDeflectedState();
 
     public CurrentState currentState;
+
+    
 
     // Stuff for collision detection and movement
     private float               _collisionOffset    = 0.0001f;
@@ -107,6 +110,7 @@ public class EnemyStateMachine : StateMachine
         _movementFilter.SetLayerMask(LayerMask.GetMask("Environment"));
         _movementFilter.useLayerMask = true;
 
+
         _health = _maxHealth;
 
         _seeker = GetComponent<Seeker>();
@@ -179,6 +183,7 @@ public class EnemyStateMachine : StateMachine
 
     public void RemoveSelf()
     {
+        EnemyManager.RunEnemyDie();
         Destroy(gameObject);
     }
 

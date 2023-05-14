@@ -26,16 +26,19 @@ public class PlayerHitState : PlayerState
             switch (nextState)
             {
                 case NextState.Die:
-                    player.SwitchState(player.DieState);
+                    //player.SwitchState(player.DieState);
+                    Interrupt(player, player.DieState);
                     break;
                 case NextState.Attack:
-                    player.SwitchState(player.AttackState);
+                    //player.SwitchState(player.AttackState);
+                    Interrupt(player, player.AttackState);
                     break;
                 case NextState.Dash:
-                    player.SwitchState(player.DashState);
+                    //player.SwitchState(player.DashState);
+                    Interrupt(player, player.DashState);
                     break;
                 case NextState.Deflect:
-                    player.SwitchState(player.DeflectState);
+                    Interrupt(player, player.DeflectState);
                     break;
                 case NextState.Idle:
                     player.SwitchState(player.IdleState);
@@ -43,7 +46,7 @@ public class PlayerHitState : PlayerState
                 default:
                     if (player.InputVector != Vector2.zero)
                     {
-                        player.SwitchState(player.IdleState);
+                        Interrupt(player, player.IdleState);
                     }
                     break;
             }
@@ -54,6 +57,12 @@ public class PlayerHitState : PlayerState
     {
         canInterrupt = false;
         nextState = NextState.Nothing;
+    }
+
+    private void Interrupt(PlayerStateMachine player, PlayerState state)
+    {
+        player.animator.SetTrigger("t_interrupt");
+        player.SwitchState(state);
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
