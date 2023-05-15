@@ -49,6 +49,9 @@ public class PlayerDeflectHitState : PlayerState
                 case NextState.Hit:
                     Interrupt(player, player.HitState);
                     break;
+                case NextState.Idle:
+                    player.SwitchState(player.IdleState);
+                    break;
                 default:
                     if (player.InputVector != Vector2.zero)
                     {
@@ -168,6 +171,8 @@ public class PlayerDeflectHitState : PlayerState
     public void EventEndDeflectHit(PlayerStateMachine player)
     {
         player.SwitchState(player.IdleState);
+        canInterrupt = true;
+        startDeflectHit = false;
     }
 
     public void EventAllowBuffer()

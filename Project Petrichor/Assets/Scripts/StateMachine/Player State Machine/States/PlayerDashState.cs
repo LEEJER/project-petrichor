@@ -30,6 +30,8 @@ public class PlayerDashState : PlayerState
             if (player.InputVector != Vector2.zero) { player.FacingVector = player.InputVector; }
             player.VelocityVector = player.FacingVector.normalized * player.DashSpeed;
 
+            player.Health += 5f;
+
             Animate(player);
         }
         else if (canInterrupt)

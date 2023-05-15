@@ -113,7 +113,8 @@ public class PlayerStateMachine : StateMachine
     {
         // update health bar
         _health += _barRate * Time.deltaTime;
-        if (_health > _maxHealth) { _health = _maxHealth; }
+        _health = Mathf.Clamp(_health, 0f, _maxHealth);
+        //if (_health > _maxHealth) { _health = _maxHealth; }
         GameManager.instance.SetBarPercentage(_health / _maxHealth);
 
         // move

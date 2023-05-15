@@ -103,6 +103,7 @@ public class EnemyAttackState : EnemyState
                         // goto hit state
                         nextState = NextState.Hit;
                     }
+                    hurtbox.enabled = false;
                 }
             }
         }
@@ -122,6 +123,7 @@ public class EnemyAttackState : EnemyState
                     }
                     else
                     {
+                        hurtbox.enabled = false;
                         enemy.VelocityVector = -enemy.LastAttackVector.normalized * enemy.Knockback;
                     }
                 }

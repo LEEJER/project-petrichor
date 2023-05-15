@@ -52,11 +52,11 @@ public class PlayerDeflectState : PlayerState
             canInterrupt = false;
             startDeflect = false;
             canBufferInput = false;
-            
+
             //startDeflectHit = false;
 
             //deflectBoxGameObject.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, dir));
-
+            player.Health += 5f;
             
             Animate(player);
 
@@ -185,6 +185,8 @@ public class PlayerDeflectState : PlayerState
                     startDeflect = false;
                     canBufferInput = false;
                     canInterrupt = true;
+
+                    player.Health -= 10f;
                     //deflectBox.enabled = true;
                 }
                 else
