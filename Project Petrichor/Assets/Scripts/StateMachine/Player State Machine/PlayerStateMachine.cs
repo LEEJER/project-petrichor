@@ -109,7 +109,7 @@ public class PlayerStateMachine : StateMachine
         _health = 0f;
 
         PlayerAudioSource = transform.GetComponent<AudioSource>();
-        PlayerAudioSource.volume = 0.07f;
+        PlayerAudioSource.volume = 0.05f;
 
         // Initial state is IDLE
         _currentState = IdleState;

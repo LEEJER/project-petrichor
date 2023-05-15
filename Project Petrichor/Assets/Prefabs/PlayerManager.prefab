@@ -44,6 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d79ba8802193a244697308902a2c9a3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 3126387061210021522, guid: 1f7e0736333a30c4b8010f5210a891a4, type: 3}
+  spawnPoint: {fileID: 0}
+  testMarker: {fileID: 0}
   TimeAlive: 0
   EnemiesKilled: 0
+  DifficultyInterval: 30
+  DifficultyMultiplier: 1
+  _overlap: {fileID: 0}
+  player: {fileID: 0}
