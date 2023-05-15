@@ -408,6 +408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
+  difficultyMultiplier: 1
 --- !u!95 &5190121621737360945
 Animator:
   serializedVersion: 5

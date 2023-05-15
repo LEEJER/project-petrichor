@@ -13,6 +13,7 @@ public class EnemyDeflectedState : EnemyState
         enemy.currentState = EnemyStateMachine.CurrentState.Deflected;
         nextState = NextState.Nothing;
         time = 0f;
+        enemy.enemySprite.color = new Color(0.2f, 0.2f, 0.5f);
     }
 
     public override void UpdateState(EnemyStateMachine enemy)
@@ -43,6 +44,7 @@ public class EnemyDeflectedState : EnemyState
     {
         nextState = NextState.Nothing;
         time = 0f;
+        enemy.enemySprite.color = new Color(0.5f, 0, 0);
     }
 
     public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)

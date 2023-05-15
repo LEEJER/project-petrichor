@@ -48,11 +48,17 @@ public class EnemyAttackState : EnemyState
             time += Time.fixedDeltaTime;
         }
 
+        if (time > maxTime - 0.5f && time < maxTime)
+        {
+            enemy.enemySprite.color = new Color(0.7f, 0.7f, 0f);
+        }
+
         if (time > maxTime)
         {
             time = 0;
             if (!cooldown)
             {
+                enemy.enemySprite.color = new Color(1f, 0f, 0f);
                 hurtbox.enabled = true;
                 enemy.VelocityVector = (enemy.PathfindingTarget - enemy.EnemyRigidbody.position).normalized * 3f;
                 enemy.LastAttackVector = enemy.VelocityVector.normalized;
@@ -62,6 +68,7 @@ public class EnemyAttackState : EnemyState
             }
             else
             {
+                enemy.enemySprite.color = new Color(0.2f, 0.2f, 0.5f);
                 nextState = NextState.Chase;
                 hurtbox.enabled = false;
                 cooldown = false;
@@ -81,6 +88,7 @@ public class EnemyAttackState : EnemyState
         cooldown = false;
         time = 0;
         hurtbox.enabled = false;
+        enemy.enemySprite.color = new Color(0.5f, 0, 0);
     }
 
     public override void OnHitboxEnter(EnemyStateMachine enemy, Collider2D collision, string selfComponent)

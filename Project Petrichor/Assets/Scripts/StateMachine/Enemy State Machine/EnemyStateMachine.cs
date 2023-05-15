@@ -79,6 +79,8 @@ public class EnemyStateMachine : StateMachine
     public Transform Hurtbox;
     public Transform Hitbox;
 
+    public SpriteRenderer enemySprite;
+
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
     public Vector2  LastAttackVector    { get { return _lastAttackVector; } set { _lastAttackVector = value; } }
@@ -121,6 +123,8 @@ public class EnemyStateMachine : StateMachine
         _movementFilter.useLayerMask = true;
 
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        enemySprite = transform.Find("Sprite").GetComponent<SpriteRenderer>();
+        enemySprite.color = new Color(0.5f, 0, 0);
 
         _health = _maxHealth;
 

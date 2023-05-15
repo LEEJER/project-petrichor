@@ -56,7 +56,7 @@ public class PlayerDeflectState : PlayerState
             //startDeflectHit = false;
 
             //deflectBoxGameObject.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, dir));
-            player.Health += 3f * player.difficultyMultiplier;
+            player.Health += 2f * player.difficultyMultiplier;
             
             Animate(player);
 

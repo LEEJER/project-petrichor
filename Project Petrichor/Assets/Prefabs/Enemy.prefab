@@ -243,6 +243,7 @@ MonoBehaviour:
   DetectionBox: {fileID: 5357061418384950110}
   Hurtbox: {fileID: 374359656}
   Hitbox: {fileID: 1093910988}
+  enemySprite: {fileID: 0}
 --- !u!210 &5357061418133739175
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -436,7 +437,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 1136016140, guid: 465cc1033fe70594aa1afab9fbf286bf, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.18753722, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
