@@ -5,12 +5,31 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
+    public enum CurrentScene
+    {
+        Nothing,
+        MainMenu,
+        Level1,
+        GameOver
+    }
+
+    public CurrentScene scene = CurrentScene.Nothing;
+
+    public string Scene = "";
+
     GameObject playerManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerManager = GameObject.Find("PlayerManager");
+        switch (scene)
+        {
+            case CurrentScene.Level1:
+                playerManager = GameObject.Find("PlayerManager");
+                break;
+            default:
+                break;
+        }
     }
 
     // Update is called once per frame

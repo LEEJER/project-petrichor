@@ -57,8 +57,6 @@ public class PlayerStateMachine : StateMachine
     private Rigidbody2D _playerRigidBody;
     private Collider2D  _playerCollider;
 
-    public Image HealthBar;
-
     private float _health = 0f;
     private float _maxHealth = 100f;
     private float _barRate = 1f;

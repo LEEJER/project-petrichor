@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class GameManager : MonoBehaviour
     public EnemyManager     EnemyManager;
     public GameObject       Environment;
 
-    private Transform _healthBarObject;
     private Transform _healthBar;
     private Transform _canvas;
 
@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Started");
         if (OnEnemyDie == null)
         {
             OnEnemyDie = new UnityEvent();
@@ -37,7 +36,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("awake");
         // singleton
         if (instance != null)
         {
@@ -52,21 +50,10 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    private void OnEnable()
-    {
-        Debug.Log("enable");
-    }
-
     public void SavePlayerScore()
     {
         _playerKills = PlayerManager.EnemiesKilled;
         _playerTime = PlayerManager.TimeAlive;
-    }
-
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-
     }
 
     private void OnDisable()
@@ -81,9 +68,34 @@ public class GameManager : MonoBehaviour
 
     public void SetBarPercentage(float val)
     {
+
+        if (UIManager != null)
+        {
+            _healthBar = UIManager.transform.Find("Canvas/HealthBar/Bar");
+        }
         if (_healthBar != null)
         {
             _healthBar.GetComponent<Image>().rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200f * val);
+        }
+    }
+
+    public void SetGameOverScore()
+    {
+        Debug.Log("Setting Score");
+        TextMeshProUGUI score = null;
+        TextMeshProUGUI timeAlive = null;
+        if (UIManager != null)
+        {
+            score = UIManager.transform.Find("Canvas/Menu/Score").GetComponent<TextMeshProUGUI>();
+            timeAlive = UIManager.transform.Find("Canvas/Menu/TimeAlive").GetComponent<TextMeshProUGUI>();
+        }
+        if (score != null)
+        {
+            score.text = "Enemies Killed: " + _playerKills;
+        }
+        if (timeAlive != null)
+        {
+            timeAlive.text = "Time Survived: " + _playerTime;
         }
     }
 
@@ -91,31 +103,18 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("Level1");
     }
-
     public void ReturnToMenu()
     {
         SceneManager.LoadScene("MainMenu");
     }
-
     public void GameOver()
     {
         SceneManager.LoadScene("GameOver");
     }
-
     public void FindUIManager()
     {
         UIManager = GameObject.Find("UIManager");
-        if (UIManager != null)
-        {
-            _canvas = UIManager.transform.Find("Canvas");
-            _healthBarObject = _canvas.transform.Find("HealthBar");
-            if (_healthBarObject != null)
-            {
-                _healthBar = _healthBarObject.transform.Find("Bar");
-            }
-        }
     }
-
     public void FindPlayerManager()
     {
         GameObject playerManager = GameObject.Find("PlayerManager");
