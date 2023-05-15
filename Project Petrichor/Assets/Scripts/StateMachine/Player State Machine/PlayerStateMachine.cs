@@ -54,12 +54,14 @@ public class PlayerStateMachine : StateMachine
     // Game object components
     private Animator    _animator;
     private Sword       _sword;
-    private Rigidbody2D _playerRigidBody;
+    private Rigidbody2D _playerRigidbody;
     private Collider2D  _playerCollider;
 
     private float _health = 0f;
     private float _maxHealth = 100f;
     private float _barRate = 1f;
+
+    public float difficultyMultiplier = 1f;
 
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
@@ -68,6 +70,7 @@ public class PlayerStateMachine : StateMachine
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
     public Animator animator            { get { return _animator; } private set { _animator = value; } }
     public Sword    sword               { get { return _sword; }    private set { _sword = value; } }
+    public Rigidbody2D  PlayerRidigbody { get { return _playerRigidbody; }  private set { _playerRigidbody = value; } }
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
     public float    DashSpeed           { get { return _dashSpeed; }        set { _dashSpeed = value; } }
     public float    SelfKnockback       { get { return _selfKnockback; }    set { _selfKnockback = value; } }
@@ -81,7 +84,7 @@ public class PlayerStateMachine : StateMachine
     {
         // setup other
         _animator           = transform.Find("Sprite").GetComponent<Animator>();
-        _playerRigidBody    = GetComponent<Rigidbody2D>();
+        _playerRigidbody    = GetComponent<Rigidbody2D>();
         _playerCollider     = GetComponent<Collider2D>();
         _sword              = transform.Find("Sword").GetComponent<Sword>();
 
@@ -112,7 +115,7 @@ public class PlayerStateMachine : StateMachine
     private void FixedUpdate()
     {
         // update health bar
-        _health += _barRate * Time.deltaTime;
+        _health += _barRate * ((difficultyMultiplier - (difficultyMultiplier % 1)) + (difficultyMultiplier % 1)/2f) * Time.deltaTime;
         _health = Mathf.Clamp(_health, 0f, _maxHealth);
         //if (_health > _maxHealth) { _health = _maxHealth; }
         GameManager.instance.SetBarPercentage(_health / _maxHealth);
@@ -148,7 +151,7 @@ public class PlayerStateMachine : StateMachine
             if (countX == 0) { newDir = new Vector2(direction.x, 0) * (Mathf.Abs(direction.x) * speed) * Time.fixedDeltaTime; }
             else if (countY == 0) { newDir = new Vector2(0, direction.y) * (Mathf.Abs(direction.y) * speed) * Time.fixedDeltaTime; }
         }
-        _playerRigidBody.MovePosition(_playerRigidBody.position + newDir);
+        _playerRigidbody.MovePosition(_playerRigidbody.position + newDir);
         return newDir;
     }
 
@@ -229,7 +232,7 @@ public class PlayerStateMachine : StateMachine
 
     public void GetHit(EnemyStateMachine enemy)
     {
-        _health += enemy.Damage;
+        _health += enemy.Damage * difficultyMultiplier;
         // apply self knockback
         _velocityVector += enemy.LastAttackVector.normalized * enemy.Knockback * _selfKnockback;
         _facingVector = -_velocityVector.normalized;

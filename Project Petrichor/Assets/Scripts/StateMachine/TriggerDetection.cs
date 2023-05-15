@@ -8,7 +8,7 @@ public class TriggerDetection : MonoBehaviour
     private StateMachine machine;
     public string component;
 
-    private void Start()
+    private void Awake()
     {
         machine = obj.GetComponent<StateMachine>();
     }

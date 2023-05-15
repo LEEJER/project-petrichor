@@ -5,10 +5,14 @@ using UnityEngine;
 public class EnemyIdleState : EnemyState
 {
     public NextState nextState = NextState.Nothing;
+    private float idleTime = 0f;
+    private float waitToPatrol = 0f;
     public override void EnterState(EnemyStateMachine enemy)
     {
         enemy.currentState = EnemyStateMachine.CurrentState.Idle;
         nextState = NextState.Nothing;
+        idleTime = 0f;
+        waitToPatrol = Random.Range(1f, 3f);
     }
 
     public override void UpdateState(EnemyStateMachine enemy)
@@ -21,8 +25,16 @@ public class EnemyIdleState : EnemyState
             case NextState.Hit:
                 enemy.SwitchState(enemy.HitState);
                 break;
+            case NextState.Patrol:
+                enemy.SwitchState(enemy.PatrolState);
+                break;
             default:
                 break;
+        }
+        idleTime += Time.fixedDeltaTime;
+        if (idleTime >= waitToPatrol)
+        {
+            nextState = NextState.Patrol;
         }
     }
 

@@ -67,6 +67,11 @@ public class EnemyAttackState : EnemyState
                 cooldown = false;
             }
         }
+
+        if (enemy.VelocityVector == Vector2.zero)
+        {
+            hurtbox.enabled = false;
+        }
     }
 
     public override void ExitState(EnemyStateMachine enemy)

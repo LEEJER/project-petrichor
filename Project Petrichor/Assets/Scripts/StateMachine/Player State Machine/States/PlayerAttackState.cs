@@ -38,6 +38,8 @@ public class PlayerAttackState : PlayerState
             startAttack     = false;
             canBufferInput  = false;
 
+            player.Health += 4f * player.difficultyMultiplier;
+
             player.VelocityVector   = (player.VelocityVector * 0.5f) + dir.normalized * player.sword.swingMovementSpeed;
             attackNum               = (attackNum + 1) % 2;
         }
@@ -71,21 +73,6 @@ public class PlayerAttackState : PlayerState
             }
         }
 
-        //else if (startNext == NextState.Deflect && canInterrupt)
-        //{
-        //    player.animator.SetTrigger("t_deflect");
-        //    Interrupt(player, player.DeflectState);
-        //}
-        //else if (startNext == NextState.Dash && canInterrupt)
-        //{
-        //    player.animator.SetTrigger("t_dash");
-        //    Interrupt(player, player.DashState);
-        //}
-        //else if (player.InputVector != Vector2.zero && canInterrupt)
-        //{
-        //    player.FacingVector = player.InputVector;
-        //    Interrupt(player, player.IdleState);
-        //}
     }
 
     public override void ExitState(PlayerStateMachine player)
@@ -98,13 +85,7 @@ public class PlayerAttackState : PlayerState
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)
     {
-        //if (context.started || context.performed)
-        //{
-        //    if (canInterrupt)
-        //    {
-        //        Interrupt(player, player.IdleState);
-        //    }
-        //}
+
     }
     public override void OnFire(PlayerStateMachine player, InputAction.CallbackContext context)
     {
@@ -135,9 +116,13 @@ public class PlayerAttackState : PlayerState
             // if we hit an enemy, specifically the hitbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hitbox"))
             {
-                
+                EnemyStateMachine.CurrentState state = other.transform.parent.GetComponent<EnemyStateMachine>().currentState;
+                if (state != EnemyStateMachine.CurrentState.Hit)
+                {
+                    player.Health -= 3f;
+                }
                 // only apply large knockback if enemy was not deflected
-                if (other.transform.parent.GetComponent<EnemyStateMachine>().currentState != EnemyStateMachine.CurrentState.Deflected)
+                if (state != EnemyStateMachine.CurrentState.Deflected)
                 {
                     // apply self knockback
                     player.VelocityVector += -player.sword.dir.normalized * player.sword.knockbackForce * player.SelfKnockback;

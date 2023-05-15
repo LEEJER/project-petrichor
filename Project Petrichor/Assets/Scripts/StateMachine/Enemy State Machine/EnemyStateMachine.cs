@@ -38,6 +38,7 @@ public class EnemyStateMachine : StateMachine
     // Movement params
     //private float _maxVelocity        = 10f;
     private float   _movementSpeed      = 1f;
+    private float   _patrolMovementSpeed= 0.25f;
     private float   _velocityDecayRate  = 8f;
 
     private float   _chaseSpeed         = 1.1f;
@@ -48,6 +49,7 @@ public class EnemyStateMachine : StateMachine
     private Vector2 _velocityVector     = Vector2.zero;
     private Vector2 _facingVector       = Vector2.down;
     private Vector2 _lastAttackVector   = Vector2.zero;
+    private Vector2 _spawnPoint         = Vector2.zero;
     //private Vector2 _desireVector       = Vector2.zero;
     public Vector2[]    DesireVectors   = new Vector2[12];
     public float[]      DesireWeights   = new float[12];
@@ -73,12 +75,18 @@ public class EnemyStateMachine : StateMachine
 
     public GameManager gameManager;
 
+    public Transform DetectionBox;
+    public Transform Hurtbox;
+    public Transform Hitbox;
+
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  VelocityVector      { get { return _velocityVector; }   set { _velocityVector = value; } }
     public Vector2  LastAttackVector    { get { return _lastAttackVector; } set { _lastAttackVector = value; } }
+    public Vector2  SpawnPoint          { get { return _spawnPoint; }       set { _spawnPoint = value; } }
     //public Vector2  DesireVector        { get { return _desireVector; }     set { _desireVector = value; } }
     public Animator animator            { get { return _animator; } private set { _animator = value; } }
     public float    MovementSpeed       { get { return _movementSpeed; }    set { _movementSpeed = value; } }
+    public float    PatrolMovementSpeed { get { return _patrolMovementSpeed; }   set { _patrolMovementSpeed = value; } }
     public float    ChaseSpeed          { get { return _chaseSpeed; }       set { _chaseSpeed = value; } }
     public float    AttackDistance      { get { return _attackDistance; }   set { _attackDistance = value; } }
     public float    KnockbackResistance { get { return _knockbackResistance; }   set { _knockbackResistance = value; } }
@@ -128,6 +136,9 @@ public class EnemyStateMachine : StateMachine
 
         _currentState = IdleState;
         _currentState.EnterState(this);
+
+        Hitbox.GetComponent<Collider2D>().enabled = true;
+        DetectionBox.GetComponent<Collider2D>().enabled = true;
     }
 
     private void FixedUpdate()
@@ -253,6 +264,7 @@ public class EnemyStateMachine : StateMachine
 
         return DesireVectors[dir];
     }
+
 
     private float GetObstructionWeight(Vector2 direction, float distance)
     {
