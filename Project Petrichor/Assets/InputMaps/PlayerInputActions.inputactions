@@ -313,6 +313,17 @@
                     "action": "Deflect",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "24f3342e-e1c7-407a-9cbd-b594a86d5958",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Deflect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
