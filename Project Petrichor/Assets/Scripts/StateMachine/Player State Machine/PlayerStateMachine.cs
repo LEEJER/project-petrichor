@@ -18,6 +18,14 @@ public class PlayerStateMachine : StateMachine
         Die
     }
 
+    public enum AudioClips
+    {
+        Swipe,
+        Slice,
+        Hit,
+        Deflect
+    }
+
     // STATE MACHINE STUFF
     private PlayerState             _currentState;
     public  PlayerAttackState       AttackState     = new PlayerAttackState();
@@ -63,6 +71,11 @@ public class PlayerStateMachine : StateMachine
 
     public float difficultyMultiplier = 1f;
 
+    public AudioSource PlayerAudioSource;
+    public AudioClip[] playerSwipeSound     = new AudioClip[3];
+    public AudioClip[] playerSliceSound     = new AudioClip[2];
+    public AudioClip[] playerHitSound       = new AudioClip[3];
+    public AudioClip[] playerDeflectSound   = new AudioClip[1];
 
     public Vector2  FacingVector        { get { return _facingVector; }     set { _facingVector = value; } }
     public Vector2  RelativeMousePos    { get { return _relativeMousePos; } set { _relativeMousePos = value; } }
@@ -95,7 +108,8 @@ public class PlayerStateMachine : StateMachine
 
         _health = 0f;
 
-        
+        PlayerAudioSource = transform.GetComponent<AudioSource>();
+        PlayerAudioSource.volume = 0.07f;
 
         // Initial state is IDLE
         _currentState = IdleState;
@@ -241,6 +255,27 @@ public class PlayerStateMachine : StateMachine
     public void AddHealth()
     {
         _health = Mathf.Max(_health - 10f, 0f);
+    }
+
+    public void PlayAudioClip(AudioClips clips)
+    {
+        switch (clips)
+        {
+            case AudioClips.Deflect:
+                PlayerAudioSource.PlayOneShot( playerDeflectSound[Random.Range(0, (int)playerDeflectSound.Length)] );
+                break;
+            case AudioClips.Hit:
+                PlayerAudioSource.PlayOneShot(playerHitSound[Random.Range(0, (int)playerHitSound.Length)]);
+                break;
+            case AudioClips.Slice:
+                PlayerAudioSource.PlayOneShot(playerSliceSound[Random.Range(0, (int)playerSliceSound.Length)]);
+                break;
+            case AudioClips.Swipe:
+                PlayerAudioSource.PlayOneShot(playerSwipeSound[Random.Range(0, (int)playerSwipeSound.Length)]);
+                break;
+            default:
+                break;
+        }
     }
 
     public void Event_AttackState_AllowInterrupt()      { AttackState.EventAllowInterrupt();        }

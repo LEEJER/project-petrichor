@@ -19,7 +19,7 @@ public class PlayerDeflectHitState : PlayerState
         startDeflectHit = true; 
         nextState       = NextState.Nothing;
         dir             = player.VelocityVector * -1f;
-        Animate(player);
+        //Animate(player);
     }
 
     public override void UpdateState(PlayerStateMachine player)
@@ -28,6 +28,9 @@ public class PlayerDeflectHitState : PlayerState
         {
             canInterrupt = false;
             canBufferInput = false;
+            startDeflectHit = false;
+
+            player.PlayAudioClip(PlayerStateMachine.AudioClips.Deflect);
 
             Animate(player);
 
@@ -89,6 +92,7 @@ public class PlayerDeflectHitState : PlayerState
         canInterrupt = true;
         canBufferInput = false;
         nextState = NextState.Nothing;
+        startDeflectHit = false;
     }
 
     public override void OnMove(PlayerStateMachine player, InputAction.CallbackContext context)

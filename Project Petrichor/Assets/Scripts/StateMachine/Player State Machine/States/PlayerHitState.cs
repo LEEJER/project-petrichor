@@ -11,6 +11,9 @@ public class PlayerHitState : PlayerState
     {
         //Debug.Log("player was hit, coming from: " + player.currentState);
         player.currentState = PlayerStateMachine.CurrentState.Hit;
+
+        player.PlayAudioClip(PlayerStateMachine.AudioClips.Hit);
+
         Animate(player);
         canInterrupt = false;
     }

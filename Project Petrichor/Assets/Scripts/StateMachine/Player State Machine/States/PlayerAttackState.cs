@@ -32,6 +32,7 @@ public class PlayerAttackState : PlayerState
             dir = player.RelativeMousePos.normalized;
             Animate(player);
             player.sword.SwordAttack(dir, attackNum);
+            player.PlayAudioClip(PlayerStateMachine.AudioClips.Swipe);
 
             nextState       = NextState.Nothing;
             canInterrupt    = false;
@@ -116,6 +117,8 @@ public class PlayerAttackState : PlayerState
             // if we hit an enemy, specifically the hitbox
             if (other.layer == LayerMask.NameToLayer("Enemy") && other.CompareTag("Hitbox"))
             {
+
+                player.PlayAudioClip(PlayerStateMachine.AudioClips.Slice);
                 EnemyStateMachine.CurrentState state = other.transform.parent.GetComponent<EnemyStateMachine>().currentState;
                 if (state != EnemyStateMachine.CurrentState.Hit)
                 {
